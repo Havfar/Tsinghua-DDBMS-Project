@@ -1,5 +1,10 @@
+import datetime
 
 from pyhive import hive
+
+from Models.Article import Article
+from Models.Read import Read
+from Models.User import User
 from utils import gen_an_read
 import numpy
 import config
@@ -17,6 +22,12 @@ class HiveClient:
             result = cur.fetchall()
         except:
             result = "None"
+        return result
+
+    def get_user_read(self):
+        cur = self.conn.cursor()
+        cur.execute('select * from user_read')
+        result = cur.fetchall()
         return result
 
     def get_all_tables(self):
@@ -41,20 +52,56 @@ class HiveClient:
             result = "None"
         return result
 
-    def create_user(self,):
-        pass
+    def create_user(self, user):
+        cur = self.conn.cursor()
+        cur.execute('insert into table user_table values' + user.__str__())
 
-    def create_article(self):
-        pass
+    def create_article(self, article):
+        cur = self.conn.cursor()
+        cur.execute('insert into table article_table values' + article.__str__())
 
-    def read_article(self, uid, aid):
-        pass
+    def read_article(self, read):
+        cur = self.conn.cursor()
+        cur.execute('insert into table user_read values' + read.__str__())
+        cur.execute('select * from user_read')
+        print(cur.fetchall())
+
+    def get_user_read_table_by_user(self, user):
+        cur = self.conn.cursor()
+        cur.execute('select  * '
+                    'from (select aid, uid from user_read where uid="' + user.uid +'") r '
+                    'left outer join (select uid, name from user_table) usr '
+                    'on ( r.uid = usr.uid) '
+                    'left outer join (select aid, title from article_table) artcl '
+                    'on (r.aid = artcl.aid) '
+
+                    )
+        result = cur.fetchall()
+        return result
+
+    def get_user_read_table_by_read(self, read):
+        cur = self.conn.cursor()
+        cur.execute('select  * '
+                    'from (select aid, uid from user_read where id="' + read.id +'") r '
+                    'left outer join (select uid, name from user_table) usr '
+                    'on ( r.uid = usr.uid) '
+                    'left outer join (select aid, title from article_table) artcl '
+                    'on (r.aid = artcl.aid) '
+
+                    )
+        result = cur.fetchall()
+        return result
 
     def get_article_by_id(self, aid):
-        pass
+        cur = self.conn.cursor()
+        cur.execute('select * from article_table where aid=' + aid)
+        return cur.fetchall()
 
-    def get_user_by_id(self, uid, region = None):
-        pass
+    def get_user_by_uid(self, uid, region = None):
+        cur = self.conn.cursor()
+        cur.execute('select * from user_table where user_table.uid="'+uid + '"')
+        return cur.fetchall()
+
 
     def get_read_count_by_aid(self, aid):
         pass
@@ -66,15 +113,17 @@ class HiveClient:
         pass
 
     def get_popularity_rank(self):
-        pass
+        cur = self.conn.cursor()
+        cur.execute()
+
+    def misc(self):
+        cur = self.conn.cursor()
+        cur.execute('alter table user_table change newid uid string ')
+        cur.execute('describe user_table')
+        return cur.fetchall()
 
 
-
-
-
-client = HiveClient(host_name=config.host_name, password=config.password, portNumber=config.port, user=config.user)
-print(client.get_table_by_name('user_table'))
-print(client.get_all_tables())
-print(client.describe_table('user_table'))
-
+def prettyPrint(input):
+    for element in input:
+        print(element)
 
