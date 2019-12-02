@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Page Title</title>
+    <!-- <meta name="description" content="Roughly 155 characters">
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="script.js"></script> -->
+  </head>
+  <body>
+    <!-- Content -->
+    <h1>DDBMS app</h1>
+    <h2>Region: Hongkong 香港</h2>
+
+    <!-- Form -->
+    <!-- <form action="/formpost" method="post">
+      Name: <input name="name" type="text" /> <br /> 
+      Age: <input max="99" min="1" name="age" step="1" type="number" value="18" /> <br />
+      <select name="gender">
+          <option selected="selected" value="male">Male</option>
+          <option value="female">Female</option>
+      </select><br /> 
+      <input checked="checked" name="newsletter" type="radio" value="daily" /> Daily <input name="newsletter" type="radio" value="weekly" /> Weekly<br />
+      <textarea cols="20" name="comments" rows="5">Comment</textarea><br />
+      <label><input name="terms" type="checkbox" value="tandc" />Accept terms</label> <br />
+      <input type="submit" value="Submit" />
+    </form> -->
+    <form action="/formpost" method="post">
+      User name: <input name="name" type="text" /> <br /> 
+      Table name: <input name="tablename" type="text" /> <br /> 
+      Article type: <input name="article_type" type="text" /> <br /> 
+      Uid: <input name="uid" type="text" /> <br /> 
+      Aid: <input name="aid" type="text" /> <br />
+      <!-- Age: <input max="99" min="1" name="age" step="1" type="number" value="18" /> <br /> -->
+      <select name="query">
+          <option value="get_table_by_tablename">Get table by tablename</option>
+          <option value="get_user_read">Get user-read</option>
+          <option value="get_all_tables">Get all tables</option>
+          <option value="get_all_databases">Get all databases</option>
+          <option value="describe_table">Describe table</option>
+          <option value="create_user">Create user</option>
+          <option value="create_article">Create article</option>
+          <option value="read_article">Read article</option>
+          <option value="get_user_read_table_by_user">Get user-read-table by user</option>
+          <option value="get_user_read_table_by_read">Get user-read-table by read</option>
+          <option value="get_article_by_id">Get article by id</option>
+          <option value="get_user_by_id">Get user by id</option>
+          <option value="get_readcount_by_aid">Get readcount by aid</option>
+          <option value="get_readcount_by_aid_and_uid">Get readcount by aid and uid</option>
+          <option value="update_read">update read - BROKEN</option>
+          <option value="get_popularity_rank">Get popularity rank</option>
+      </select><br /> 
+      <!-- <input checked="checked" name="newsletter" type="radio" value="daily" /> Daily <input name="newsletter" type="radio" value="weekly" /> Weekly<br />
+      <textarea cols="20" name="comments" rows="5">Comment</textarea><br />
+      <label><input name="terms" type="checkbox" value="tandc" />Accept terms</label> <br /> -->
+      <input type="submit" value="Submit" />
+  </form>
+
+  </body>
+</html>
