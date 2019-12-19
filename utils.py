@@ -1,9 +1,15 @@
+import datetime
 import json
+import uuid
 from random import random
 import numpy as np
 from PIL import Image
 from shutil import copyfile
 import os
+
+from Models.Article import Article
+from Models.Read import Read
+from Models.User import User
 
 USERS_NUM = 10000
 ARTICLES_NUM = 10000
@@ -18,17 +24,15 @@ aid_lang = {}
 # 50 tags
 # 2000 authors
 def gen_an_article (i):
-    timeBegin = 1506000000000
     article = {}
-    article["id"] = 'a'+str(i)
-    article["timestamp"] = str(timeBegin + i)
-    article["aid"] = str(i)
-    article["title"] = "title%d" % i
-    article["category"] = "science" if random() > 0.55 else "technology"
-    article["abstract"] = "abstract of article %d" % i
-    article["articleTags"] = "tags%d" % int(random() * 50)
-    article["authors"]  = "author%d" % int(random() * 2000)
-    article["language"] = "en" if random() > 0.5 else "zh"
+    timestamp = get_current_timestamp()
+    aid = create_id('a')
+    title = "title%d" % i
+    category = "science" if random() > 0.55 else "technology"
+    abstract = "abstract of article %d" % i
+    article_tags = "tags%d" % int(random() * 50)
+    author  = "author%d" % int(random() * 2000)
+    language = "en" if random() > 0.5 else "zh"
     # create text
     article["text"] = "text_a"+str(i)+'.txt'
     path = './articles/article'+str(i)
@@ -55,65 +59,64 @@ def gen_an_article (i):
     # create video
     if random() < 0.05:
         #has one video
-        article["video"] = "video_a"+str(i)+'_video.flv'
+        video = "video_a"+str(i)+'_video.flv'
         if random()<0.5:
             copyfile('./video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
         else:
             copyfile('./video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
     else:
-        article["video"] = ""
+        video = ""
 
-    aid_lang[article["aid"]] = article["language"]
-    return "(" +  \
-            "\"" + article["id"] + "\", " + \
-            "\"" + article["aid"] + "\", " + \
-            "\"" + article["timestamp"] + "\", " + \
-            "\"" + article["title"] + "\", " + \
-            "\"" + article["category"] + "\", " + \
-            "\"" + article["abstract"] + "\", " + \
-            "\"" + article["articleTags"] + "\", " + \
-            "\"" + article["authors"] + "\", " + \
-            "\"" + article["language"] + "\", " + \
-            "\"" + article["text"] + "\", " + \
-            "\"" + article["image"] + "\", " + \
-            "\"" + article["video"] + "\")";
+    aid_lang[aid] = language
+    return Article(
+        timestamp=timestamp,
+        aid = aid,
+        title = title,
+        category = category,
+        abstract  =abstract,
+        article_tags = article_tags,
+        author = author,
+        text = str(text),
+        language = language,
+        image = str(img),
+        video = ""
+    )
 
+# Used to create unique ids to Articles/ Users / Reads/ be_reads / pop_rank
+def create_id(prefix):
+    return prefix + str(uuid.uuid4())
 
+def get_current_timestamp():
+    return str(datetime.datetime.now())[:-3]
+
+print(get_current_timestamp())
 
 def gen_an_user (i):
-    timeBegin = 1506328859000
     user = {}
-    user["timestamp"] = str(timeBegin + i)
-    user["id"] = 'u'+str(i)
-    user["uid"] = str(i)
-    user["name"] = "user%d" % i
-    user["gender"] = "male" if random() > 0.33 else "female"
-    user["email"] = "email%d" % i
-    user["phone"] = "phone%d" % i
-    user["dept"]  = "dept%d" % int(random() * 20)
-    user["grade"] = "grade%d" % int(random() * 4 + 1)
-    user["language"] = "en" if random() > 0.8 else "zh"
-    user["region"] = "Beijing" if random() > 0.4 else "Hong Kong"
-    user["role"] = "role%d" % int(random() * 3)
-    user["preferTags"] = "tags%d" % int(random() * 50)
-    user["obtainedCredits"] = str(int(random() * 100))
+    timestamp = get_current_timestamp()
+    uid = create_id("u")
+    name = "user%d" % i
+    gender = "male" if random() > 0.33 else "female"
+    email = "email%d" % i
+    phone = "phone%d" % i
+    dept  = "dept%d" % int(random() * 20)
+    grade = "grade%d" % int(random() * 4 + 1)
+    age = int(random()*100)
+    language = "en" if random() > 0.8 else "zh"
+    region = "Beijing" if random() > 0.4 else "HongKong"
+    role = "role%d" % int(random() * 3)
+    prefer_tags = "tags%d" % int(random() * 50)
+    obtained_credits = str(int(random() * 100))
 
-    uid_region[user["uid"]] = user["region"]
-    return "(" + \
-           "\"" + user["id"] + "\", " + \
-           "\"" + user["timestamp"] + "\", " + \
-            "\"" + user["uid"] + "\", " + \
-            "\"" + user["name"] + "\", " + \
-            "\"" + user["gender"] + "\", " + \
-            "\"" + user["email"] + "\", " + \
-            "\"" + user["phone"] + "\", " + \
-            "\"" + user["dept"] + "\", " + \
-            "\"" + user["grade"] + "\", " + \
-            "\"" + user["language"] + "\", " + \
-            "\"" + user["region"] + "\", " + \
-            "\"" + user["role"] + "\", " + \
-            "\"" + user["preferTags"] + "\", " + \
-            "\"" + user["obtainedCredits"] + "\")";
+    uid_region[uid] = region
+    return User(timestamp=timestamp,
+                uid=uid, name=name,
+                gender=gender, email=email,
+                phone=phone, dept=dept,
+                age=age, language=language,
+                region=region, role=role,
+                prefer_tags=prefer_tags,
+                obtained_credits=obtained_credits)
 
 
 p = {}
@@ -125,36 +128,26 @@ p["Hong Kong" + "zh"] = [0.8, 0.2, 0.2, 0.1]
 
 def gen_an_read(i):
 
-    timeBegin = 1506332297000
+    timeBegin = get_current_timestamp()
     read = {}
-    read["timestamp"] = str(timeBegin + i * 10000)
-    read["id"] = 'r' + str(i)
-    read["uid"] = str(int(random() * USERS_NUM))
-    read["aid"] = str(int(random() * ARTICLES_NUM))
-    region = 'Beijing'#uid_region[read["uid"]]
-    lang = 'en'#aid_lang[read["aid"]]
+    timestamp = get_current_timestamp()
+    rid = create_id("r")
+    uid = str(int(random() * USERS_NUM))
+    aid= str(int(random() * ARTICLES_NUM))
+    region = uid_region[uid]
+    lang = aid_lang[aid]
     ps = p[region + lang]
 
     if (random() > ps[0]):
         # read["readOrNot"] = "0";
         return gen_an_read(i)
     else:
-        read["readOrNot"] = "1"
-        read["readTimeLength"] = str(int(random() * 100))
-        read["readSequence"] = str(int(random() * 4))
-        read["agreeOrNot"] = "1" if random() < ps[1] else "0"
-        read["commentOrNot"] = "1" if random() < ps[2] else "0"
-        read["shareOrNot"] = "1" if random() < ps[3] else "0"
-        read["commentDetail"] = "comments to this article: (" + read["uid"] + "," + read["aid"] + ")"
-    return "(" + \
-           "\"" + read["id"] + "\", " + \
-           "\"" + read["uid"] + "\", " + \
-           "\"" + read["aid"] + "\", " + \
-           "\"" + read["timestamp"] + "\", " + \
-           "\"" + read["readOrNot"] + "\", " + \
-           "\"" + read["readTimeLength"] + "\", " + \
-           "\"" + read["readSequence"] + "\", " + \
-           "\"" + read["agreeOrNot"] + "\", " + \
-           "\"" + read["commentOrNot"] + "\", " + \
-           "\"" + read["shareOrNot"] + "\", " + \
-           "\"" + read["commentDetail"] + "\")"
+        read_or_not = True
+        read_time_length = str(int(random() * 100))
+        read_sequence = str(int(random() * 4))
+        agree_or_not = True if random() < ps[1] else False
+        comment_or_not = True if random() < ps[2] else False
+        share_or_not = True if random() < ps[3] else False
+        comment_detail = "comments to this article: (" + uid + "," + aid + ")"
+    return Read(rid, timestamp=timestamp, uid=uid, aid= aid, read_or_not=read_or_not, read_time_length=read_time_length, read_sequence=read_sequence, agree_or_not=agree_or_not,
+                comment_or_not= comment_or_not, share_or_not=share_or_not, comment_detail=comment_detail)

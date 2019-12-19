@@ -9,7 +9,7 @@ from Models.Popular_rank import Popular_rank
 from Models.Read import Read
 from Models.User import User
 import uuid
-from utils import gen_an_read
+from utils import gen_an_read, gen_an_user, gen_an_article
 import numpy
 import config
 
@@ -72,13 +72,13 @@ class HiveClient:
     # Input: User object
     def create_user(self, user):
         cur = self.conn.cursor()
-        cur.execute('insert into table user_table values' + user.__str__())
-        #cur.execute('insert into table user_partitioned partition(region ="' + user.region + '") values' + user.__str__())
+        #cur.execute('insert into table user_table values' + user.__str__())
+        cur.execute('insert into table users partition(region ="' + user.region + '") values' + user.__str__())
 
     # Input: Article object
     def create_article(self, article):
         cur = self.conn.cursor()
-        cur.execute('insert into table article_table values' + article.__str__())
+        cur.execute('insert into table articles partition(category ="' + article.category + '") values' + article.__str__())
 
     # Input: Read object
     def create_read(self, read):
@@ -135,22 +135,41 @@ class HiveClient:
         return result
 
 
-    def get_article_by_aid(self, aid):
-        cur = self.conn.cursor()
-        cur.execute('select * from article_table where aid=' + aid)
-        article = Article(input_string=cur.fetchall())
+    def get_article_by_aid(self, aid, category = None):
+        if category == None:
+            cur = self.conn.cursor()
+            cur.execute('select * from articles where aid="' + aid + '"')
+        else:
+            cur = self.conn.cursor()
+            cur.execute('select * from articles where articles.aid="' + aid + '" and articles.category = "' + category + '")')
+        user = User(input_string=str(cur.fetchall()))
+        article = Article(input_string=str(cur.fetchall()))
         return article
 
     # Should provide region
     def get_user_by_uid(self, uid, region = None):
         if region == None:
             cur = self.conn.cursor()
-            cur.execute('select * from user_table where user_table.uid="' + uid + '"')
+            cur.execute('select * from users where users.uid="' + uid + '"')
         else:
             cur = self.conn.cursor()
-            cur.execute('select * from user_table where (user_table.uid="' + uid + '" and user_table.region = ""' + region + '")')
+            cur.execute('select * from users where (users.uid="' + uid + '" and users.region = "' + region + '")')
+        user = User(input_string=str(cur.fetchall()))
+        return user
 
-        return cur.fetchall()
+    def get_users_by_region(self, region):
+        cur = self.conn.cursor()
+        cur.execute('select * from users where region="' + region + '"')
+        output = cur.fetchall()
+        print(output.__len__())
+        users = []
+        for item in output:
+            users.append(User(str(item)))
+        return users
+
+    def get_articles_by_category(self, category):
+        pass
+
 
 
     # Returns a list of read objects whom have commented
@@ -238,12 +257,13 @@ class HiveClient:
 
     #ONLY USED FOR EXPERIMENTING
     def misc(self):
-        cur = self.conn.cursor()
-
-        cur.execute('select * from user_partitioned ')
-        print(cur.fetchall())
-
-        return "none"#cur.fetchall()
+        # cur = self.conn.cursor()
+        #
+        # cur.execute('select * from user_partitioned ')
+        # print(cur.fetchall())
+        #
+        # return "none"#cur.fetchall()
+        return
 
 
 def pretty_print(input):
@@ -251,12 +271,13 @@ def pretty_print(input):
         print(element)
 
 
-
-#client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
-#client.misc()
-
+print("setting up connection " , config.host_name, config.port)
+client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+print(client.get_users_by_region(region="Beijing")[0])
+#client.create_article(gen_an_article(0))
+#print(client.get_user_by_uid(uid="u636a1cda-01ac-467c-b8b9-1bb69f26838c", region="Hong Kong"))
+#print(gen_an_user(1).__str__())
 # Testing objects
-#user = User(input_string="('u69', '1506328859009', '9', 'user69', 'male', 'email69', 'phone9', 'dept9', 'grade1', 'zh', 'Hong Kong', 'role0', 'tags32', '32')")
 #article1 = Article(input_string="('t0', 't0', '1506000000002', 'title2', 'science', 'abstract of article 2', 'tags30', 'author616', 'zh', 'text_a2.txt', 'image_a2_0.jpg,', '')")
 #read = Read(input_string="('rt2', 'u69', 't0', '1506332297000', '1', '68', '0', '0', '0', '0', 'comments to this article: (u69,t0)'),")
 #new_read = Read(input_string="('rt2', 'u69', 't0', '1506332297000', '1', '69', '0', '0', '0', '0', 'comments to this article: (u69,t0)'),")

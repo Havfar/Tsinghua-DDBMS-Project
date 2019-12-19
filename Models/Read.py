@@ -3,7 +3,7 @@ class Read:
 
     def __init__(self, id = None, aid = None,  uid = None, timestamp=None, read_or_not = 0,
                  read_time_length = 0, read_sequence=0, agree_or_not=0,
-                 commentOrNot=None, share_or_not=None, comment_detail=None, input_string = None):
+                 comment_or_not=None, share_or_not=None, comment_detail=None, input_string = None):
         if input_string == None:
             self.id = id
             self.aid = aid
@@ -13,7 +13,7 @@ class Read:
             self.read_time_length = read_time_length
             self.read_sequence = read_sequence
             self.agree_or_not = agree_or_not
-            self.comment_or_not = commentOrNot
+            self.comment_or_not = comment_or_not
             self.share_or_not = share_or_not
             self.comment_detail = comment_detail
         else:
