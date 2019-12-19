@@ -24,10 +24,13 @@ class HiveClient:
         return prefix + str(uuid.uuid4())
 
     # Returns table by name. Possiblity to change selected columns
-    def get_table_by_name(self, table_name, columns='*', order_by='asc'):
+    def get_table_by_name(self, table_name, columns='*', order_by='asc', page_size=None, page_number = None):
         cur = self.conn.cursor()
+        query = 'select ' + columns + ' from ' + table_name
+        if page_size != None and page_number != None
+            query += ' limit ' + str(page_size) + ' offset ' + str(page_number*page_size)
         try:
-            cur.execute('select ' + columns + ' from ' + table_name)
+            cur.execute(query)
             result = cur.fetchall()
         except:
             result = "None"
@@ -35,7 +38,7 @@ class HiveClient:
 
     # Returns a list of all users whom have read the article
     # May need to change if it is not possible to update table row (e.g check for latest row)
-    def get_user_read_by_aid(self, aid):
+    def get_user_read_by_aid(self, aid, page_size=None, page_number = None):
         cur = self.conn.cursor()
         cur.execute('select * from user_read where aid="' + aid + '"')
         users:List[User] = []
@@ -97,7 +100,7 @@ class HiveClient:
 
     # Experimenting with joins
     # NOT FOR PRODUCTION
-    def get_user_read_table_by_user(self, user):
+    def get_user_read_table_by_user(self, user, page_size=None, page_number = None):
         cur = self.conn.cursor()
         cur.execute('select  * '
                     'from (select aid, uid from user_read where uid="' + user.uid +'") r '
@@ -110,7 +113,7 @@ class HiveClient:
         return result
 
 
-    def get_user_read_table_by_uid(self, uid):
+    def get_user_read_table_by_uid(self, uid, page_size=None, page_number = None):
         cur = self.conn.cursor()
         cur.execute('select  * '
                     'from user_read '
@@ -121,7 +124,7 @@ class HiveClient:
             read_list.append(Read(input_string = element))
         return read_list
 
-    def get_user_read_table_by_read(self, read):
+    def get_user_read_table_by_read(self, read, page_size=None, page_number = None):
         cur = self.conn.cursor()
         cur.execute('select  * '
                     'from (select aid, uid from user_read where id="' + read.id +'") r '
@@ -157,7 +160,7 @@ class HiveClient:
         user = User(input_string=str(cur.fetchall()))
         return user
 
-    def get_users_by_region(self, region):
+    def get_users_by_region(self, region, page_size=None, page_number = None):
         cur = self.conn.cursor()
         cur.execute('select * from users where region="' + region + '"')
         output = cur.fetchall()
@@ -167,13 +170,13 @@ class HiveClient:
             users.append(User(str(item)))
         return users
 
-    def get_articles_by_category(self, category):
+    def get_articles_by_category(self, category, page_size=None, page_number = None):
         pass
 
 
 
     # Returns a list of read objects whom have commented
-    def get_article_comments_by_aid(self, aid):
+    def get_article_comments_by_aid(self, aid, page_size=None, page_number = None):
         cur = self.conn.cursor()
         cur.execute('select * from user_read where (user_read.aid = "' + aid + '" and user_read.comment_or_not = 1) order by var_timestamp desc')
         read_list: List[Read] = []
@@ -182,20 +185,20 @@ class HiveClient:
         return read_list
 
     #Retruns the read from an user and an article
-    def get_read(self, aid, uid):
+    def get_read(self, aid, uid, page_size=None, page_number = None):
         cur = self.conn.cursor()
         cur.execute('select * from user_read where (user_read.aid ="' + aid + '" and user_read.uid = "'+ uid +'")')
         read = Read(input_string=str(cur.fetchall()))
         return read
 
-    def get_be_read_by_aid(self, aid):
+    def get_be_read_by_aid(self, aid, page_size=None, page_number = None):
         cur = self.conn.cursor()
         cur.execute('select * from be_read where be_read.aid = "' + aid + '"')
         be_read = Be_read(input_string = str(cur.fetchall()))
         return be_read
 
     # Returns a list of read objects whom have read
-    def get_read_count_by_aid(self, aid):
+    def get_read_count_by_aid(self, aid, page_size=None, page_number = None):
         cur = self.conn.cursor()
         cur.execute(
             'select * from user_read where (user_read.aid = "' + aid + '" and user_read.read_or_not = 1) order by var_timestamp desc')
@@ -249,7 +252,13 @@ class HiveClient:
                     + '" and user_read.aid = "' + be_read.aid + '")'
                     )
 
-    def get_popularity_rank(self, temporal_granularity):
+    #TODO: create function
+    def update_pop_rank(self, pop_rank):
+        pass;
+
+
+
+    def get_popularity_rank(self, temporal_granularity, category):
         cur = self.conn.cursor()
         cur.execute('select * from popular_rank where tempporal_granularity="' + temporal_granularity+'"')
         rank = Popular_rank(cur.fetchall())
@@ -257,12 +266,10 @@ class HiveClient:
 
     #ONLY USED FOR EXPERIMENTING
     def misc(self):
-        # cur = self.conn.cursor()
-        #
-        # cur.execute('select * from user_partitioned ')
-        # print(cur.fetchall())
-        #
-        # return "none"#cur.fetchall()
+        cur = self.conn.cursor()
+        cur.execute('update test_tab set name="bob" where name = "name"')
+        cur.execute('select * from test_tab')
+        print(cur.fetchall())
         return
 
 
@@ -273,7 +280,8 @@ def pretty_print(input):
 
 print("setting up connection " , config.host_name, config.port)
 client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
-print(client.get_users_by_region(region="Beijing")[0])
+#print(client.get_users_by_region(region="Beijing")[0])
+client.misc()
 #client.create_article(gen_an_article(0))
 #print(client.get_user_by_uid(uid="u636a1cda-01ac-467c-b8b9-1bb69f26838c", region="Hong Kong"))
 #print(gen_an_user(1).__str__())
