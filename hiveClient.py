@@ -96,7 +96,7 @@ class HiveClient:
     # Input: Popular_rank object
     def create_popular_rank(self, pop_rank):
         cur = self.conn.cursor()
-        cur.execute('insert into table popular_rank values' + pop_rank.__str__())
+        cur.execute('insert into table popular_rank partition(category = "'+ pop_rank.category +'") values' + pop_rank.__str__())
 
     # Experimenting with joins
     # NOT FOR PRODUCTION
@@ -236,54 +236,50 @@ class HiveClient:
     #TODO: Can you update in hive?
     def update_read(self, read):
         cur = self.conn.cursor()
-        print(read.id, read.uid, read.aid)
         cur.execute('update user_read set'
-                    + ' id = ' + read.aid
-                    + ' uid = ' + read.uid
-                    + ' uid = ' + read.uid
-                    + ' aid = ' + read.aid
                     + ' var_timestamp = ' + read.timestamp
-                    + ' read_or_not = ' + read.read_or_not
-                    + ' read_time_length = ' + read.read_time_length
-                    + ' read_sequence = ' +read.read_sequence
-                    + ' agree_or_not = ' + read.agree_or_not
-                    + ' comment_or_not = ' + read.comment_or_not
-                    + ' share_or_not = ' + read.share_or_not
-                    + ' comment_detail = ' + read.comment_detail
-                    + ' where (user_read.uid = "' + read.uid
-                    + '" and user_read.aid = "' + read.aid + '")'
+                    + ', read_or_not = ' + read.read_or_not
+                    + ', read_time_length = ' + read.read_time_length
+                    + ', read_sequence = ' +read.read_sequence
+                    + ', agree_or_not = ' + read.agree_or_not
+                    + ', comment_or_not = ' + read.comment_or_not
+                    + ', share_or_not = ' + read.share_or_not
+                    + ', comment_detail = ' + read.comment_detail
+                    + ' where user_read.rid = "' + read.rid
                     )
 
-    #NOT WORKING
-    #TODO: Can you delete row in hive?
+
     def delete_read(self,read):
         cur = self.conn.cursor()
-        cur.execute('delete from user_read where(user_read.uid = "'+ read.uid + '" and user_read.aid = "' + read.aid + '")')
+        cur.execute('delete from read where(read.uid = "'+ read.uid + '" and read.aid = "' + read.aid + '")')
 
-    #NOT WORKING
-    #TODO: Can you update in hive?
     def update_be_read(self, be_read):
         cur = self.conn.cursor()
         cur.execute('update be_read set '
                     + ' timestamp = ' + be_read.timestamp
-                    + ' read_uid_list = ' + be_read.read_uid_list
-                    + ' comment_num = ' + be_read.comment_num
-                    + ' comment_uid_list = ' +be_read.comment_uid_list
-                    + ' agree_num = ' + be_read.agree_num
-                    + ' agree_uid_list = ' + be_read.agree_uid_list
-                    + ' share_num = ' + be_read.share_num
-                    + ' share_uid_list = ' + be_read.share_uid_list
-                    + ' where (user_read.uid = "' + be_read.uid
-                    + '" and user_read.aid = "' + be_read.aid + '")'
+                    + ', read_uid_list = ' + be_read.read_uid_list
+                    + ', comment_num = ' + be_read.comment_num
+                    + ', comment_uid_list = ' +be_read.comment_uid_list
+                    + ', agree_num = ' + be_read.agree_num
+                    + ', agree_uid_list = ' + be_read.agree_uid_list
+                    + ', share_num = ' + be_read.share_num
+                    + ', share_uid_list = ' + be_read.share_uid_list
+                    + ' where brid = "' + be_read.brid
                     )
 
-    #TODO: create function
-    def update_pop_rank(self, pop_rank):
-        pass;
+    def update_pop_rank_aid_list(self, pop_rank, new_aid_list):
+        cur = self.conn.cursor();
+        query = 'update pop_rank set article_aid_list = "' + new_aid_list + '" where pid ="' + pop_rank.pid + '"'
+        cur.execute(query)
+
+    def delete_pop_rank_item(self, pop_rank):
+        cur = self.conn.cursor();
+        query = 'delete from pop_rank where pid="' + pop_rank.pid + '"'
+        cur.execute(query)
 
     def get_popularity_rank(self, temporal_granularity, category):
         cur = self.conn.cursor()
-        cur.execute('select * from popular_rank where tempporal_granularity="' + temporal_granularity+'"')
+        cur.execute('select * from popular_rank where (temporal_granularity="' + temporal_granularity+'" and category = "' + category + '")')
         rank = Popular_rank(cur.fetchall())
         return rank
 

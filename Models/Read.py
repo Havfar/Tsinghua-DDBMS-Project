@@ -1,11 +1,11 @@
 
 class Read:
 
-    def __init__(self, id = None, aid = None,  uid = None, timestamp=None, read_or_not = 0,
+    def __init__(self, rid = None, aid = None,  uid = None, timestamp=None, read_or_not = 0,
                  read_time_length = 0, read_sequence=0, agree_or_not=0,
                  comment_or_not=None, share_or_not=None, comment_detail=None, input_string = None):
         if input_string == None:
-            self.id = id
+            self.rid = rid
             self.aid = aid
             self.uid = uid
             self.timestamp = timestamp
@@ -20,7 +20,7 @@ class Read:
             input_string = input_string.replace("(", "")
             input_string = input_string.replace(")", "")
             input_string = input_string.split(', ')
-            self.id = input_string[0].replace("'", "")
+            self.rid = input_string[0].replace("'", "")
             self.uid = input_string[1].replace("'", "")
             self.aid = input_string[2].replace("'", "")
             self.timestamp = input_string[3].replace("'", "")
@@ -34,7 +34,7 @@ class Read:
 
     def __str__(self):
         return  "(" + \
-            "\"" + self.id + "\", " + \
+            "\"" + self.rid + "\", " + \
             "\"" + self.uid + "\", " + \
             "\"" + self.aid + "\", " + \
             "\"" + self.timestamp + "\", " + \
