@@ -1,12 +1,11 @@
 
 class Article:
 
-    def __init__(self, id=None, aid = None, timestamp = None, title = None,
+    def __init__(self, aid = None, timestamp = None, title = None,
                  category = None, abstract = None, article_tags = None,
                  author = None, language = None, text = None, image = None,
                  video = None, input_string = None):
         if input_string == None:
-            self.id = id
             self.aid = aid
             self.timestamp = timestamp
             self.title = title

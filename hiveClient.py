@@ -297,10 +297,10 @@ def pretty_print(input):
         print(element)
 
 
-print("setting up connection " , config.host_name, config.port)
-client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+#   print("setting up connection " , config.host_name, config.port)
+#   client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 #print(client.get_users_by_region(region="Beijing")[0])
-client.misc()
+#   client.misc()
 #client.create_article(gen_an_article(0))
 #print(client.get_user_by_uid(uid="u636a1cda-01ac-467c-b8b9-1bb69f26838c", region="Hong Kong"))
 #print(gen_an_user(1).__str__())
