@@ -2,65 +2,92 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+export default class SearchBar extends React.Component  {
+    constructor (props) {
+        super(props);
+        this.state = { 
+            searchCategory: "",
+            alternatives: ["Users", "Articles"],
+            region: "Beijing",
+            category: "Technology",
+            search: "",
+            parent: props.parent
+        };
+    }
 
-export default function SearchBar(props)  {
+    changeSearch = (e) => {this.setState({search : e.target.value})}
+    changeSearchCategory = (e) => {this.setState({searchCategory : e.target.value})}
+    changeRegion = (e) => {this.setState({region: e.target.value})}
+    changeCategory = (e) => {this.setState({category: e.target.value})}
 
-    let alternatives = ["Hei", "hallo", "Hade"]
+    getCategorySelection(){
+        return(
+            <select className="custom-select mr-1 col-2" onChange={this.changeSearchCategory}>
+                <option value={null}> - </option>
+                    {this.state.alternatives.map(function(item) {
+                    return <option value={item}>{item}</option>
+                })}
+            </select>)
+    }
 
-    return(
-         <div className="md-form mt-0">
-            <div className="row">
-                <select class="custom-select col-2 mr-1" id="inlineFormCustomSelectPref">
-                    <option selected>Choose...</option>
-                    <option value="1">{alternatives[0]}</option>
-                    <option value="2">{alternatives[1]}</option>
-                    <option value="3">{alternatives[2]}</option>
-                </select>
-                <input className="form-control col" type="text" placeholder="Search" aria-label="Search"/>
+    getRegions(){
+        return(
+            <div className="row mt-3">
+                <span className="col"/>
+                <label className="radio-inline col"><input type="radio" name="optradio" checked={this.state.region==="Beijing"} onChange={this.changeRegion} value="Beijing"/> &nbsp;Beijing</label>
+                <span className="col"/>
+                <label className="radio-inline col"><input type="radio" name="optradio" checked={this.state.region==="Hong Kong"} onChange={this.changeRegion} value="Hong Kong"/>&nbsp; Hong Kong</label>
+                <span className="col"/>
             </div>
-            <div className="row pt-3">
-                <div class="form-group col p-0">
-                    <label for="">Something</label>
-                    <input className="form-control col" type="text" placeholder="Search" aria-label="Search"/>
-                </div>
-                <span className="col-1"/>
-                <div class="form-group col p-0">
-                    <label for="">Something</label>
-                    <input className="form-control col" type="text" placeholder="Search" aria-label="Search"/>
-                </div>
-                <span className="col-1"/>
-                <div class="form-group col p-0">
-                    <label for="">Something</label>
-                    <input className="form-control col" type="text" placeholder="Search" aria-label="Search"/>
-                </div>
+        )
+    }
+
+    getCategories(){
+        return(
+            <div className="row mt-3">
+                <span className="col"/>
+                <label className="radio-inline col"><input type="radio" name="optradio" checked={this.state.category==="Technology"} onChange={this.changeCategory} value="Beijing"/> &nbsp;Technology</label>
+                <span className="col"/>
+                <label className="radio-inline col"><input type="radio" name="optradio" checked={this.state.category==="Science"} onChange={this.changeCategory} value="Hong Kong"/>&nbsp; Science </label>
+                <span className="col"/>
             </div>
-            <div className="row">
-                <div className="col-3">
-                    <label class="my-1 mr-2 " for="inlineFormCustomSelectPref">Preference</label>
-                    <select class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
-                        <option selected>Choose...</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                    </select>
+        )
+    }
+
+    getSearchOptions(){
+        if(this.state.searchCategory === "Users"){
+            return this.getRegions()
+        }else if(this.state.searchCategory === "Articles"){
+            return this.getCategories()
+        }else{
+            return
+        }
+    }
+
+    getFilters(){
+
+    }
+
+    search(){
+        if(this.state.searchCategory === "Users"){
+            this.state.parent.testConsole("users " + this.state.search.toString()+  ", " +this.state.region.toString())
+        }else if(this.state.searchCategory === "Articles"){
+            this.state.parent.testConsole("Articles " + this.state.search + ", " + this.state.category)
+        }
+    }
+
+    render(){
+        return(
+            <div className="md-form mt-0">
+                <div className="row">
+                    {this.getCategorySelection()}
+                    <input className="form-control col" type="text" placeholder="Search" aria-label="Search" value={this.state.search} onChange={e => this.setState({search: e.target.value})}/>
+                    <button type="button" className="btn btn-primary col-1 ml-1" data-toggle="button" aria-pressed="false" onClick={() =>this.search()}>
+                        Search
+                    </button>
                 </div>
-                <div class="custom-checkbox col">
-                    <input type="checkbox" class="custom-control-input" id="defaultChecked2" checked />
-                    <label class="custom-control-label" for="defaultChecked2">Default checked</label>
-                </div>
+                {this.getSearchOptions()}
             </div>
-            <div className="row">
-                <span className="col-10"></span>
-                <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
-                    Search
-                </button>
-            </div>
-        </div>
-    )
+        )
+    }
 }
-
-// function etSearchCategories(params) {
-//     return
-//         <h1></h1>
-
-// }

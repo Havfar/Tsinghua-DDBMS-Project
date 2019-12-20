@@ -48,6 +48,10 @@ export default class ClientSite extends React.Component {
         }
     }
 
+    testConsole(data){
+        console.log(data)
+    }
+
     render () {
         let TypeSearch = this.state.TypeSearch;
         if(TypeSearch == "article"){
