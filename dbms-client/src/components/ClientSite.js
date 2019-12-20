@@ -1,8 +1,10 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import Article from './Article';
 
-export default class Article extends React.Component {
+
+export default class ClientSite extends React.Component {
     constructor (props) {
         super(props)
         this.state = { visible: true }
@@ -10,7 +12,7 @@ export default class Article extends React.Component {
 
     render () {
     return <div className='message-box'>
-        Hello {this.props.name}
+        <Article></Article>
     </div>
     }
 }
