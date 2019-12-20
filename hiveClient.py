@@ -27,7 +27,7 @@ class HiveClient:
     def get_table_by_name(self, table_name, columns='*', order_by='asc', page_size=None, page_number = None):
         cur = self.conn.cursor()
         query = 'select ' + columns + ' from ' + table_name
-        if page_size != None and page_number != None
+        if page_size != None and page_number != None:
             query += ' limit ' + str(page_size) + ' offset ' + str(page_number*page_size)
         try:
             cur.execute(query)
@@ -115,10 +115,13 @@ class HiveClient:
 
     def get_user_read_table_by_uid(self, uid, page_size=None, page_number = None):
         cur = self.conn.cursor()
-        cur.execute('select  * '
-                    'from user_read '
-                    'where uid="' + uid + '" '
-                    )
+        query = 'select  * ' \
+                'from user_read  ' \
+                'where uid="' + uid + '"'
+
+        if page_size != None and page_size != None:
+            query += " limit " + str(page_size) + " offset " + str(page_number * page_size)
+        cur.execute(query)
         read_list: List[Read] = []
         for element in cur.fetchall():
             read_list.append(Read(input_string = element))
@@ -126,26 +129,27 @@ class HiveClient:
 
     def get_user_read_table_by_read(self, read, page_size=None, page_number = None):
         cur = self.conn.cursor()
-        cur.execute('select  * '
-                    'from (select aid, uid from user_read where id="' + read.id +'") r '
-                    'left outer join (select uid, name from user_table) usr '
-                    'on ( r.uid = usr.uid) '
-                    'left outer join (select aid, title from article_table) artcl '
-                    'on (r.aid = artcl.aid) '
+        query = 'select  * ' \
+                'from (select aid, uid from user_read where id="' + read.id +'") r ' \
+                'left outer join (select uid, name from user_table) usr ' \
+                'on ( r.uid = usr.uid) ' \
+                'left outer join (select aid, title from article_table) artcl ' \
+                'on (r.aid = artcl.aid) '
 
-                    )
+        if page_size != None and page_number != None:
+            query += " limit " + str(page_size) + " offset " + str(page_number*page_size)
+        cur.execute(query)
         result = cur.fetchall()
         return result
 
 
     def get_article_by_aid(self, aid, category = None):
+        cur = self.conn.cursor()
         if category == None:
-            cur = self.conn.cursor()
-            cur.execute('select * from articles where aid="' + aid + '"')
+            query = 'select * from articles where aid="' + aid + '"'
         else:
-            cur = self.conn.cursor()
-            cur.execute('select * from articles where articles.aid="' + aid + '" and articles.category = "' + category + '")')
-        user = User(input_string=str(cur.fetchall()))
+            query ='select * from articles where articles.aid="' + aid + '" and articles.category = "' + category + '")'
+        cur.execute(query)
         article = Article(input_string=str(cur.fetchall()))
         return article
 
@@ -162,7 +166,10 @@ class HiveClient:
 
     def get_users_by_region(self, region, page_size=None, page_number = None):
         cur = self.conn.cursor()
-        cur.execute('select * from users where region="' + region + '"')
+        query = 'select * from users where region="' + region + '"'
+        if page_size != None and page_number != None:
+            query += " limit " + str(page_size) + " offset " + str(page_number * page_size)
+        cur.execute(query)
         output = cur.fetchall()
         print(output.__len__())
         users = []
@@ -171,14 +178,27 @@ class HiveClient:
         return users
 
     def get_articles_by_category(self, category, page_size=None, page_number = None):
-        pass
+        cur = self.conn.cursor()
+        query = 'select * from articles where category="' + category + '"'
+        if page_size != None and page_number != None:
+            query += " limit " + str(page_size) + " offset " + str(page_number * page_size)
+        cur.execute(query)
+        output = cur.fetchall()
+        print(output.__len__())
+        articles = []
+        for item in output:
+            articles.append(User(str(item)))
+        return articles
 
 
 
     # Returns a list of read objects whom have commented
-    def get_article_comments_by_aid(self, aid, page_size=None, page_number = None):
+    def get_article_reads_by_aid(self, aid, page_size=None, page_number = None):
         cur = self.conn.cursor()
-        cur.execute('select * from user_read where (user_read.aid = "' + aid + '" and user_read.comment_or_not = 1) order by var_timestamp desc')
+        query = 'select * from user_read where (user_read.aid = "' + aid + '" and user_read.comment_or_not = 1) order by var_timestamp desc'
+        if page_size != None and page_number != None:
+            query += " limit " + str(page_size) + " offset " + str(page_number * page_size)
+        cur.execute(query)
         read_list: List[Read] = []
         for element in cur.fetchall():
             read_list.append(Read(input_string=str(element)))
@@ -193,15 +213,20 @@ class HiveClient:
 
     def get_be_read_by_aid(self, aid, page_size=None, page_number = None):
         cur = self.conn.cursor()
-        cur.execute('select * from be_read where be_read.aid = "' + aid + '"')
+        query = 'select * from be_read where be_read.aid = "' + aid + '"'
+        if page_size != None and page_number != None:
+            query += " limit " + str(page_size) + " offset " + str(page_number * page_size)
+        cur.execute(query)
         be_read = Be_read(input_string = str(cur.fetchall()))
         return be_read
 
     # Returns a list of read objects whom have read
     def get_read_count_by_aid(self, aid, page_size=None, page_number = None):
         cur = self.conn.cursor()
-        cur.execute(
-            'select * from user_read where (user_read.aid = "' + aid + '" and user_read.read_or_not = 1) order by var_timestamp desc')
+        query = 'select * from user_read where (user_read.aid = "' + aid + '" and user_read.read_or_not = 1) order by var_timestamp desc'
+        if page_size != None and page_number != None:
+            query += " limit " + str(page_size) + " offset " + str(page_number * page_size)
+        cur.execute(query)
         read_list: List[Read] = []
         for element in cur.fetchall():
             read_list.append(Read(input_string=str(element)))
@@ -255,8 +280,6 @@ class HiveClient:
     #TODO: create function
     def update_pop_rank(self, pop_rank):
         pass;
-
-
 
     def get_popularity_rank(self, temporal_granularity, category):
         cur = self.conn.cursor()
