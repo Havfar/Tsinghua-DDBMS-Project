@@ -2,95 +2,137 @@ import React from 'react'
 
 export default class User extends React.Component {
 
-constructor(props) {
-  super(props)
-  
-  this.state = { 
-    uid: undefined,
-    timestamp: undefined,
-    name: undefined,
-    gender: undefined,
-    email: undefined,
-    phone: undefined,
-    dept: undefined,
-    language: undefined,
-    role: undefined,
-    prefer_tags: undefined,
-    obtained_credits: undefined
-    }
-}   
-
-componentDidMount(){
-
-    const url = 'http://localhost:5000/load_user/?uid=' + this.props.uid;
-    fetch(url, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type':'application/json'
+    constructor(props) {
+    super(props)
+    
+    this.state = { 
+        uid: undefined,
+        timestamp: undefined,
+        name: "Alf Prøysen",
+        gender: undefined,
+        email: undefined,
+        phone: undefined,
+        dept: undefined,
+        language: undefined,
+        role: undefined,
+        prefer_tags: undefined,
+        obtained_credits: undefined,
+        showReads: false
         }
-    })
-    .then(response => response.json())
-    .then(data => this.setState({
-        uid: data.uid,
-        timestamp: data.timestamp,
-        name: data.name,
-        gender: data.gender,
-        email: data.email,
-        phone: data.phone,
-        dept: data.dept,
-        language: data.language,
-        role: data.role,
-        prefer_tags: data.prefer_tags,
-        obtained_credits: data.obtained_credits
-    }));
-}
+    }   
+
+    componentDidMount(){
+
+        const url = 'http://localhost:5000/load_user/?uid=' + this.props.uid;
+        fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type':'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => this.setState({
+            uid: data.uid,
+            timestamp: data.timestamp,
+            name: data.name,
+            gender: data.gender,
+            email: data.email,
+            phone: data.phone,
+            dept: data.dept,
+            language: data.language,
+            role: data.role,
+            prefer_tags: data.prefer_tags,
+            obtained_credits: data.obtained_credits
+        }));
+    }
+
+    toggleShowReads(){
+        this.setState({showReads : !this.state.showReads})
+    }
+
+    showUserReads(){
+        return (<table class="table mt-5">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">First</th>
+                <th scope="col">Last</th>
+                <th scope="col">Handle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>Mark</td>
+                <td>Otto</td>
+                <td>@mdo</td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>Jacob</td>
+                <td>Thornton</td>
+                <td>@fat</td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td>Larry</td>
+                <td>the Bird</td>
+                <td>@twitter</td>
+            </tr>
+            </tbody>
+        </table>
+        )
+    }
     // display the user in a div
     render () {
-    return <div>
+        return (
+            <div className="card mt-3 p-2 text-left">
+                <div className="row mb-4">
+                    <span className="col-1"></span>
+                    <div className="col-4 ">
+                        <img className="img-thumbnail" src="https://nwsid.net/wp-content/uploads/2015/05/dummy-profile-pic.png"></img>
+                    </div>
+                    <div className="col-3"></div>
+                    <div className="col-4">
+                        <h3>{this.state.name}</h3>
+                        <h5>{this.state.id}</h5>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-6">
+                    <div class="form-group ">
+                        <label className="mt-2" for="exampleInputEmail1">Email address</label>
+                        <input value={this.state.email} disabled className="form-control" />
 
-<div class="card" style={{width: "100%"}}>
-    <ul class="list-group list-group-flush">
-    <li class="list-group-item"><h1>Name{this.state.name}</h1></li>
-    <li class="list-group-item"><div>role{this.state.role}</div></li>
-    <li class="list-group-item"><div>dept{this.state.dept}</div></li>
-    <li class="list-group-item"><h6 class="card-subtitle mb-2 text-muted">email{this.state.email}</h6></li>
-    <li class="list-group-item"><h6 class="card-subtitle mb-2 text-muted">phone{this.state.phone}</h6></li>
-    <li class="list-group-item">
-    <p>
-  <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#user" aria-expanded="false" aria-controls="collapseExample">
-    <h5>extra information</h5>
-  </button>
-</p>
-<div class="collapse" id="user">
-  <div class="card card-body">
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">gender{this.state.gender}</li>
-    <li class="list-group-item">language{this.state.language}</li>
-    <li class="list-group-item">prefer_tags{this.state.prefer_tags}</li>
-    <li class="list-group-item">obtained_credits{this.state.obtained_credits}</li>
-    <li class="list-group-item">timestamp{this.state.timestamp}</li>
-    <li class="list-group-item"><a href="#" class="badge badge-info">uid{this.state.id}</a></li>
-  </ul>
-  </div>
-</div>
-    </li>
-  </ul>
-</div>
+                        <label className="mt-2" for="exampleInputEmail1">Gender</label>
+                        <input value={this.state.gender} disabled className="form-control" />
 
-        <h1>{this.state.name}</h1>
-        <div>{this.state.uid}</div>
-        <div>{this.state.timestamp}</div>
-        <div>{this.state.gender}</div>
-        <div>{this.state.email}</div>
-        <div>{this.state.phone}</div>
-        <div>{this.state.dept}</div>
-        <div>{this.state.language}</div>
-        <div>{this.state.role}</div>
-        <div>{this.state.prefer_tags}</div>
-        <div>{this.state.obtained_credits}</div>
-    </div>
-  }
+                        <label className="mt-2" for="exampleInputEmail1">Department</label>
+                        <input value={this.state.email} disabled className="form-control" />
+
+                        <label className="mt-2" for="exampleInputEmail1">Email address</label>
+                        <input value={this.state.email} disabled className="form-control" />
+                    </div>
+                    </div>
+                    <div className="col-6">
+                        <label className="mt-2" for="exampleInputEmail1">Phone number</label>
+                        <input value={this.state.phone} disabled class="form-control" />
+
+                        <label className="mt-2" for="exampleInputEmail1">Language</label>
+                        <input value={this.state.language} disabled class="form-control" />
+
+                        <label className="mt-2" for="exampleInputEmail1">Role</label>
+                        <input value={this.state.role} disabled class="form-control" />
+
+                        <label className="mt-2" for="exampleInputEmail1">Prefered tags</label>
+                        <input value={this.state.tags} disabled class="form-control" />
+                    </div>
+                </div>
+                {this.showUserReads()}
+            </div>
+        )
+    }
 }

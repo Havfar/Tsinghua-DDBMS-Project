@@ -11,8 +11,9 @@ export default class SearchBar extends React.Component  {
             region: "Beijing",
             category: "Technology",
             search: "",
-            parent: props.parent
+            parent: props.parent,
         };
+        console.log(props)
     }
 
     changeSearch = (e) => {this.setState({search : e.target.value})}
@@ -76,9 +77,19 @@ export default class SearchBar extends React.Component  {
         }
     }
 
+    getComponentClassName(){
+        if(this.state.parent.state.hideSearchBar){
+            return "md-form mt-0 d-none"
+        }else{
+            return "md-form mt-0"
+        }
+
+    }
+
     render(){
+
         return(
-            <div className="md-form mt-0">
+            <div className={this.getComponentClassName()} >
                 <div className="row">
                     {this.getCategorySelection()}
                     <input className="form-control col" type="text" placeholder="Search" aria-label="Search" value={this.state.search} onChange={e => this.setState({search: e.target.value})}/>

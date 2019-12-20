@@ -10,11 +10,17 @@ export default class ClientSite extends React.Component {
     constructor (props) {
         super(props)
         this.state = { 
-        visible: true,
-        SAid: undefined,
-        SUid: undefined,
-        TypeSearch: undefined
+            visible: true,
+            SAid: undefined,
+            SUid: undefined,
+            TypeSearch: undefined,
+            hideSearchBar: false    
         }  
+    }
+
+    toggleSearchBar = () =>{
+        console.log(this.state.hideSearchBar)
+        this.setState({hideSearchBar : !this.state.hideSearchBar})
     }
 
     callBackSearch = (data) => {
@@ -48,23 +54,21 @@ export default class ClientSite extends React.Component {
         }
     }
 
-    testConsole(data){
-        console.log(data)
+    testConsole(search){
+        console.log(search)
     }
 
     render () {
         let TypeSearch = this.state.TypeSearch;
         if(TypeSearch == "article"){
             return  <div>
-                        <SearchBar callBackSearch={this.callBackSearch}/>
+                        <SearchBar hide={this.state.hideSearchBar} callBackSearch={this.callBackSearch}/>
                         <Article aid={this.state.SAid} uid={this.state.SUid}></Article>
-                        <User></User>
                     </div>
         }
         else if (TypeSearch == "user"){
             return  <div>
                         <SearchBar callBackSearch={this.callBackSearch}/>
-                        <Article></Article>
                         <User uid={this.state.SUid}></User>
                     </div>
         }
@@ -72,7 +76,6 @@ export default class ClientSite extends React.Component {
             return  <div>
                         <SearchBar callBackSearch={this.callBackSearch}/>
                         <Article></Article>
-                        <User></User>
                     </div>
         }
         else if (TypeSearch == "allUsers"){
@@ -84,9 +87,9 @@ export default class ClientSite extends React.Component {
         }
         else{
             return  <div>
-                        <SearchBar callBackSearch={this.callBackSearch}/>
-                        <Article></Article>
-                        <User></User>
+                        <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                        <User/>
+
                     </div>
         }
     }
