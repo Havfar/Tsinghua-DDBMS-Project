@@ -1,11 +1,11 @@
 class Be_read:
-    def __init__(self, id= None, uid= None, aid= None, timestamp= None,
+    def __init__(self, brid= None, aid= None, timestamp= None,
                  read_uid_list= None, comment_num= None,
                  comment_uid_list= None, agree_num= None,
                  agree_uid_list= None, share_num= None,
                  share_uid_list= None, input_string = None):
         if input_string == None:
-            self.id = id
+            self.brid = id
             self.aid = aid
             self.timestamp = timestamp
             self.read_uid_list = read_uid_list
@@ -19,7 +19,7 @@ class Be_read:
             input_string = input_string.replace("(", "")
             input_string = input_string.replace(")", "")
             input_string = input_string.split(', ')
-            self.id = input_string[0].replace("'", "")
+            self.brid = input_string[0].replace("'", "")
             self.aid = input_string[1].replace("'", "")
             self.timestamp = input_string[2].replace("'", "")
             self.read_uid_list = input_string[3].replace("'", "")
@@ -32,7 +32,7 @@ class Be_read:
 
     def __str__(self):
         return "(" + \
-               "\"" + self.id + "\", " + \
+               "\"" + self.brid + "\", " + \
                "\"" + self.aid + "\", " + \
                "\"" + self.timestamp + "\", " + \
                "\"" + self.read_uid_list + "\", " + \
