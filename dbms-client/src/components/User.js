@@ -50,6 +50,36 @@ componentDidMount(){
     // display the user in a div
     render () {
     return <div>
+
+<div class="card" style={{width: "100%"}}>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h1>Name{this.state.name}</h1></li>
+    <li class="list-group-item"><div>role{this.state.role}</div></li>
+    <li class="list-group-item"><div>dept{this.state.dept}</div></li>
+    <li class="list-group-item"><h6 class="card-subtitle mb-2 text-muted">email{this.state.email}</h6></li>
+    <li class="list-group-item"><h6 class="card-subtitle mb-2 text-muted">phone{this.state.phone}</h6></li>
+    <li class="list-group-item">
+    <p>
+  <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#user" aria-expanded="false" aria-controls="collapseExample">
+    <h5>extra information</h5>
+  </button>
+</p>
+<div class="collapse" id="user">
+  <div class="card card-body">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">gender{this.state.gender}</li>
+    <li class="list-group-item">language{this.state.language}</li>
+    <li class="list-group-item">prefer_tags{this.state.prefer_tags}</li>
+    <li class="list-group-item">obtained_credits{this.state.obtained_credits}</li>
+    <li class="list-group-item">timestamp{this.state.timestamp}</li>
+    <li class="list-group-item"><a href="#" class="badge badge-info">uid{this.state.id}</a></li>
+  </ul>
+  </div>
+</div>
+    </li>
+  </ul>
+</div>
+
         <h1>{this.state.name}</h1>
         <div>{this.state.uid}</div>
         <div>{this.state.timestamp}</div>

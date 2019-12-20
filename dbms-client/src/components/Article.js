@@ -54,17 +54,46 @@ componentDidMount(){
     // display the user in a div
     render () {
     return <div>
-        <h1>{this.state.title}</h1>
-        <div>{this.state.aid}</div>
-        <div>{this.state.timestamp}</div>
-        <div>{this.state.abstract}</div>
-        <div>{this.state.article_tags}</div>
-        <div>{this.state.author}</div>
-        <div>{this.state.language}</div>
-        <div>{this.state.text}</div>
-        <div>{this.state.image}</div>
-        <div>{this.state.video}</div>
-        <div>{this.state.category}</div>
+        <div class="card" style={{width: "100%"}}>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h1>Tittel{this.state.title}</h1></li>
+    <li class="list-group-item"><h6 class="card-subtitle mb-2 text-muted">abstract{this.state.abstract}</h6></li>
+    <li class="list-group-item"><img src="..." class="card-img-top" alt="..."/></li>
+    <li class="list-group-item"><div>en lang tekst som er en artikkel{this.state.text}</div></li>
+    <li class="list-group-item">
+    <p>
+  <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    <h5>extra information</h5>
+  </button>
+</p>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">author{this.state.author}</li>
+    <li class="list-group-item">language{this.state.language}</li>
+    <li class="list-group-item">category{this.state.category}</li>
+    <li class="list-group-item">VIDEO{this.state.video}</li>
+    <li class="list-group-item">timestamp{this.state.timestamp}</li>
+    <li class="list-group-item">aid{this.state.aid}</li>
+    <li class="list-group-item"><a href="#" class="badge badge-primary">article_tags{this.state.article_tags}</a></li>
+  </ul>
+  </div>
+</div>
+    </li>
+  </ul>
+</div>
+{/*
+        <h1>Tittel{this.state.title}</h1>
+        <div>aid{this.state.aid}</div>
+        <div>timestamp{this.state.timestamp}</div>
+        <div>abstract{this.state.abstract}</div>
+        <div>article_tags{this.state.article_tags}</div>
+        <div>author{this.state.author}</div>
+        <div>language{this.state.language}</div>
+        <div>en lang tekst som er en artikkel{this.state.text}</div>
+        <div>BILDE{this.state.image}</div>
+        <div>VIDEO{this.state.video}</div>
+<div>category{this.state.category}</div>*/}
     </div>
   }
 }
