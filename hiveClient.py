@@ -1,6 +1,7 @@
 import datetime
 from typing import List
 
+from PIL import Image
 from pyhive import hive
 
 from Models.Article import Article
@@ -10,10 +11,9 @@ from Models.Read import Read
 from Models.User import User
 import uuid
 from utils import gen_an_read, gen_an_user, gen_an_article
-import numpy
+import numpy as np
 import config
 
-# TODO: Is it possible to bulk load in hive?( aka use LIMIT = X and Offset = X*Y)
 class HiveClient:
     def __init__(self, host_name, portNumber, user, password ):
         self.conn = hive.Connection(host=host_name, port=portNumber, username=user, password=password,
@@ -112,7 +112,6 @@ class HiveClient:
         result = cur.fetchall()
         return result
 
-
     def get_user_read_table_by_uid(self, uid, page_size=None, page_number = None):
         cur = self.conn.cursor()
         query = 'select  * ' \
@@ -141,7 +140,6 @@ class HiveClient:
         cur.execute(query)
         result = cur.fetchall()
         return result
-
 
     def get_article_by_aid(self, aid, category = None):
         cur = self.conn.cursor()
@@ -190,8 +188,6 @@ class HiveClient:
             articles.append(User(str(item)))
         return articles
 
-
-
     # Returns a list of read objects whom have commented
     def get_article_reads_by_aid(self, aid, page_size=None, page_number = None):
         cur = self.conn.cursor()
@@ -232,8 +228,6 @@ class HiveClient:
             read_list.append(Read(input_string=str(element)))
         return read_list
 
-    #NOT WORKING
-    #TODO: Can you update in hive?
     def update_read(self, read):
         cur = self.conn.cursor()
         cur.execute('update user_read set'
@@ -286,8 +280,19 @@ class HiveClient:
     #ONLY USED FOR EXPERIMENTING
     def misc(self):
         cur = self.conn.cursor()
-        cur.execute('update test_tab set name="bob" where name = "name"')
-        cur.execute('select * from test_tab')
+        a = np.random.randint(0, 255, (360, 480, 3))
+        img = Image.fromarray(a.astype('uint8')).convert('RGB')
+        img = img.tobytes("hex", "rgb")
+        #img = str(img)
+        #img = "BILDE"
+        #query = 'insert into table articles_binary partition(category = "tech") values("id1", "2019-12-20 13:38:19.020", "text","' + str(img_str) + '", " video", " noe")'
+        #cur.execute(query)
+        #query = 'drop table articles_binary'
+        #cur.execute(query)
+        #query = 'Create table articles_binary(aid string, var_timestamp timestamp, title string, text string, image binary, video string) Partitioned by (category string)'
+        query = 'select * from articles_binary'
+        cur.execute(query)
+
         print(cur.fetchall())
         return
 
@@ -297,29 +302,5 @@ def pretty_print(input):
         print(element)
 
 
-#   print("setting up connection " , config.host_name, config.port)
-#   client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
-#print(client.get_users_by_region(region="Beijing")[0])
-#   client.misc()
-#client.create_article(gen_an_article(0))
-#print(client.get_user_by_uid(uid="u636a1cda-01ac-467c-b8b9-1bb69f26838c", region="Hong Kong"))
-#print(gen_an_user(1).__str__())
-# Testing objects
-#article1 = Article(input_string="('t0', 't0', '1506000000002', 'title2', 'science', 'abstract of article 2', 'tags30', 'author616', 'zh', 'text_a2.txt', 'image_a2_0.jpg,', '')")
-#read = Read(input_string="('rt2', 'u69', 't0', '1506332297000', '1', '68', '0', '0', '0', '0', 'comments to this article: (u69,t0)'),")
-#new_read = Read(input_string="('rt2', 'u69', 't0', '1506332297000', '1', '69', '0', '0', '0', '0', 'comments to this article: (u69,t0)'),")
-#be_read1 = Be_read(id="0", aid='t0', timestamp=datetime.datetime.now().__str__(), read_uid_list="u69", comment_num="0", comment_uid_list="u69", agree_num="1", agree_uid_list="u69", share_num="1", share_uid_list="u69" )
-#pop_rank = Popular_rank(id = '0', timestamp=datetime.datetime.now().__str__(), temporal_granularity="daily", article_aid_list='t0')
-
-# client.misc()
-#print(client.get_read('t0','u69'))
-#client.create_read(read)
-#print(client.get_read('t0','u69'))
-#print(client.create_read(read))
-#print(client.describe_table('be_read'))
-#client.create_user(user)
-#print(client.get_all_tables())
-# print(client.describe_table(
-#     "user_table"
-# ))
-#print(client.get_table_by_name('user_table'))
+#print("setting up connection " , config.host_name, config.port)
+#client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)

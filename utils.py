@@ -6,10 +6,13 @@ import numpy as np
 from PIL import Image
 from shutil import copyfile
 import os
+import loremipsum
 
 from Models.Article import Article
 from Models.Read import Read
 from Models.User import User
+import base64
+from io import BytesIO
 
 USERS_NUM = 10000
 ARTICLES_NUM = 10000
@@ -18,6 +21,12 @@ READS_NUM = 1000000
 uid_region = {}
 aid_lang = {}
 
+
+def convert_img_to_string():
+    pass
+
+def convert_string_to_img():
+    pass
 
 # science:45%   technology:55%
 # en:50%    zh:50%
@@ -39,22 +48,21 @@ def gen_an_article (i):
     if not os.path.exists(path):
         os.makedirs(path)
     num = int(random()*1000)
-    text = ['Tsinghua']*num
+    text = loremipsum.generator.Generator().generate_paragraph(start_with_lorem=True)[2].replace("'",'').replace('b','')
     f = open(path+"/text_a"+str(i)+'.txt','w+',encoding="utf8")
     f.write("".join(text))
     f.close()
 
     # create images
-    image_num = int(random()*5)+1
+    image_num = 1#int(random()*5)+1
     image_str = ""
     for j in range(image_num):
         image_str+= 'image_a'+str(i)+'_'+str(j)+'.jpg,'
     article["image"] = image_str
     num_image = int(random()*5)+1
     for j in range(num_image):
-        a = np.random.randint(0,255,(360,480,3))
-        img = Image.fromarray(a.astype('uint8')).convert('RGB')
-        img.save(path+'/image_a'+str(i)+'_'+str(j)+'.jpg')
+        img = create_img_bin_string()
+
 
     # create video
     if random() < 0.05:
@@ -151,3 +159,19 @@ def gen_an_read(i):
         comment_detail = "comments to this article: (" + uid + "," + aid + ")"
     return Read(rid, timestamp=timestamp, uid=uid, aid= aid, read_or_not=read_or_not, read_time_length=read_time_length, read_sequence=read_sequence, agree_or_not=agree_or_not,
                 comment_or_not= comment_or_not, share_or_not=share_or_not, comment_detail=comment_detail)
+
+
+def create_img_bin_string():
+    buffered = BytesIO()
+    a = np.random.randint(0, 255, (360, 480, 3))
+    img = Image.fromarray(a.astype('uint8')).convert('RGB')
+    img.save(buffered, format="JPEG")
+    img_str = base64.b64encode(buffered.getvalue())
+    return img_str
+
+def bin_to_img(bin_str):
+    img = Image.frombytes(data=bin_str)
+    return img
+
+
+
