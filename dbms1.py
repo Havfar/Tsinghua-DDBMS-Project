@@ -119,26 +119,28 @@ def create_article():
 
     return "Article created"
 
-
 # returns article by aid on json format {}, also updates be_read table and requesting user read_table
-@app.route('/load_article', methods = ['GET'])
+@app.route('/load_article/', methods = ['GET'])
 def load_article():
+    uid = request.args.get('uid')
+    aid = request.args.get('aid')
+    print("uid:", uid, "aid:", aid)
 
-    content = request.json
-    print("Content:", content)
-    uid = content["uid"]
-    aid = content["aid"]
+    #content = request.json
+    #print("Content:", content)
+    #uid = content["uid"]
+    #aid = content["aid"]
     current_time = utils.get_current_timestamp()
 
     # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
     # Get article from hive
-    requested_article = client.get_article_by_aid(aid = content["aid"], category=None)
+    requested_article = client.get_article_by_aid(aid = aid, category=None)
 
 
     # Create Read object of the loaded article aid and uid
-    new_read = Read(id=None, aid=aid, uid=uid, timestamp=current_time, read_or_not=True, read_time_length=0, read_sequence=1, agree_or_not=True, comment_or_not=None, share_or_not=None, comment_detail=None, input_string=None)
+    new_read = Read(aid=aid, uid=uid, timestamp=current_time, read_or_not=True, read_time_length=0, read_sequence=1, agree_or_not=True, comment_or_not=None, share_or_not=None, comment_detail=None, input_string=None)
 
     # insert new_read into hive
     client.create_read(new_read)
@@ -158,16 +160,18 @@ def load_article():
 
 
 # returns user object for given uid, returns json {}
-@app.route('/load_user', methods = ['GET'])
+@app.route('/load_user/', methods = ['GET'])
 def load_user():
-    content = request.json
-    print("Content:", content)
+    uid = request.args.get('uid')
+    print("uid:", uid)
+    #content = request.json
+    #print("Content:", content)
 
     # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
     # Get user from hive
-    requested_user = client.get_user_by_uid(uid = content["uid"], region=None)
+    requested_user = client.get_user_by_uid(uid = uid, region=None)
 
     return requested_user.__dict__
 
