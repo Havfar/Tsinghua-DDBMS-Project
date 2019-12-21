@@ -5,6 +5,7 @@ import Article from './Article';
 import User from './User';
 import SearchBar from './Searchbar';
 import NavBar from './NavBar';
+import PopularRank from './PopularRank';
 
 
 export default class ClientSite extends React.Component {
@@ -18,6 +19,7 @@ export default class ClientSite extends React.Component {
             hideSearchBar: false,
             toDoList: ["per", "paal", "askeladden"],
             currentPageNumber : 1,
+            activeComponent:'clientSite',
             loggedInUser: undefined
         }  
     }
@@ -200,13 +202,34 @@ export default class ClientSite extends React.Component {
         }
     }
 
+    getPopularRank(){
+        return(
+            <PopularRank/>
+        )
+    }
+
+    getAcitveComponent(){
+        switch(this.state.activeComponent){
+            case "clientSite":
+                return this.genClientSite(this.state.TypeSearch)
+            case "PopularRank":
+                return this.getPopularRank()
+        }
+    }
+
+    changeActiveComponent(component){
+        this.setState({activeComponent:component})
+    }
+
     render () {
         return  <div>
-                    <NavBar callBackLoggedInUser={this.callBackLoggedInUser}/>
-                    <div class="container">
+                    <NavBar callBackLoggedInUser={this.callBackLoggedInUser} parent={this}/>
+                    <div class="container mt-5">
                             <div class="row">
                                 <div class="col-lg-12 text-center"></div>
-                                    {this.genClientSite(this.state.TypeSearch)}
+                                    {this.getAcitveComponent()}
+                                    {/* {this.genClientSite(this.state.TypeSearch)} */}
+                                    {/* {this.getPopularRank()} */}
                                 </div>
                             </div>
                     </div>

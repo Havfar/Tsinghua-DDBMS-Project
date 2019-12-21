@@ -69,9 +69,11 @@ export default class Article extends React.Component {
         this.setState({compressed: !this.state.compressed})
     }
 
+
+
     getFullView(){
         return(
-            <div className="card text-left mt-4" onClick={this.toggleCompress}>
+            <div className="card text-left " onClick={this.toggleCompress}>
                 <span className="col-1"/>
                 <div className="col">
                     <div className="row mt-3">
@@ -92,6 +94,7 @@ export default class Article extends React.Component {
                     <div className="row">
                         <p className="col">{this.state.text}</p>
                     </div>
+
                 </div>
                 <span className="col-1"/>
             </div>
