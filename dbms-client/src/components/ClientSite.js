@@ -14,7 +14,7 @@ export default class ClientSite extends React.Component {
             visible: true,
             SAid: undefined,
             SUid: undefined,
-            TypeSearch: "user",
+            TypeSearch: "article",
             hideSearchBar: false,
             toDoList: ["per", "paal", "askeladden"],
             currentPageNumber : 1,
@@ -28,6 +28,7 @@ export default class ClientSite extends React.Component {
     }
 
     callBackSearch = (TypeSearch, searchString, region, category) => {
+        console.log(searchString)
         switch(TypeSearch){
             case "article":
                 this.setState({
@@ -100,10 +101,9 @@ export default class ClientSite extends React.Component {
         let counter = 0;
         const items = someList.map((item) => {
             counter += 1;
-            return <li>
-                {counter}
-                <Article compressed={true} collapseTarget={counter} id={counter}/>
-            </li>}
+            return (
+                <Article collapseTarget={counter} id={counter}/>
+            )}
             )
             counter += 1;
             return items

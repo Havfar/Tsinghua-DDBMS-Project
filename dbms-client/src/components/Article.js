@@ -1,132 +1,112 @@
 import React from 'react'
 
 export default class Article extends React.Component {
-
-constructor(props) {
-  super(props)
-
-    // kjøre funksjon for å laste inn userdata
-
-  this.state = { 
-    aid: undefined,
-    timestamp: undefined,
-    title: undefined,
-    abstract: undefined,
-    article_tags: undefined,
-    author: undefined,
-    language: undefined,
-    text: undefined,
-    image: undefined,
-    video: undefined,
-    category: undefined,
-    compressed: undefined
+    constructor(props) {
+        super(props)
+        this.state = { 
+            aid: 6969696969,
+            timestamp: "2019-09-09",
+            title: "BREAKING NEWS!",
+            abstract: "My money's in that office, right? If she start giving me some bullshit about it ain't there, and we got to go someplace else and get it, I'm gonna shoot you in the head then and there. Then I'm gonna shoot that bitch in the kneecaps, find out where my goddamn money is. She gonna tell me too. Hey, look at me when I'm talking to you, motherfucker. You listen: we go in there, and that nigga Winston or anybody else is in there, you the first motherfucker to get shot. You understand?",
+            article_tags: "Tags ",
+            author: "Alf Prøysen",
+            language: "en",
+            text: "Well, the way they make shows is, they make one show. That show's called a pilot. Then they show that show to the people who make shows, and on the strength of that one show they decide if they're going to make more shows. Some pilots get picked and become television programs. Some don't, become nothing. She starred in one of the ones that became nothing. Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw Antwone into a glass motherfuckin' house, fuckin' up the way the nigger talks. Motherfucker do that shit to me, he better paralyze my ass, 'cause I'll kill the motherfucker, know what I'm sayin'?",
+            image: undefined,
+            video: undefined,
+            category: "Technology",
+            compressed: true
+            }
+        }   
+    componentDidMount(){
+        const url = 'http://localhost:5000/load_article/?aid=' + this.props.aid+"&uid="+this.props.uid;
+        fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type':'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => this.setState({
+            aid: data.aid,
+            timestamp: data.timestamp,
+            title: data.title,
+            abstract: data.abstract,
+            article_tags: data.article_tags,
+            author: data.author,
+            language: data.language,
+            text: data.text,
+            image: data.image,
+            video: data.video,
+            category: data.category
+        }));
     }
-}   
 
-
-componentDidMount(){
-
-  // Is it compressed?
-  this.setState({
-    compressed: this.props.compressed
-  })
-
-    const url = 'http://localhost:5000/load_article/?aid=' + this.props.aid+"&uid="+this.props.uid;
-    fetch(url, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type':'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => this.setState({
-        aid: data.aid,
-        timestamp: data.timestamp,
-        title: data.title,
-        abstract: data.abstract,
-        article_tags: data.article_tags,
-        author: data.author,
-        language: data.language,
-        text: data.text,
-        image: data.image,
-        video: data.video,
-        category: data.category
-    }));
-}
-
-    render () {
-      if(!this.state.compressed){
-    return <div>
-        <div class="card" style={{width: "100%"}}>
-    <ul class="list-group list-group-flush">
-    <li class="list-group-item"><h1>Tittel{this.state.title}</h1></li>
-    <li class="list-group-item"><h6 class="card-subtitle mb-2 text-muted">abstract{this.state.abstract}</h6></li>
-    <li class="list-group-item"><img src="..." class="card-img-top" alt="..."/></li>
-    <li class="list-group-item"><div>en lang tekst som er en artikkel{this.state.text}</div></li>
-    <li class="list-group-item">
-    <p>
-  <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#exampleCollapse" aria-expanded="false" aria-controls="collapseExample">
-    <h5>extra information</h5>
-  </button>
-</p>
-<div class="collapse" id="exampleCollapse">
-  <div class="card card-body">
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">author{this.state.author}</li>
-    <li class="list-group-item">language{this.state.language}</li>
-    <li class="list-group-item">category{this.state.category}</li>
-    <li class="list-group-item">VIDEO{this.state.video}</li>
-    <li class="list-group-item">timestamp{this.state.timestamp}</li>
-    <li class="list-group-item">aid{this.state.aid}</li>
-    <li class="list-group-item"><a href="#" class="badge badge-primary">article_tags{this.state.article_tags}</a></li>
-  </ul>
-  </div>
-</div>
-    </li>
-  </ul>
-</div>
-{/*
-        <h1>Tittel{this.state.title}</h1>
-        <div>aid{this.state.aid}</div>
-        <div>timestamp{this.state.timestamp}</div>
-        <div>abstract{this.state.abstract}</div>
-        <div>article_tags{this.state.article_tags}</div>
-        <div>author{this.state.author}</div>
-        <div>language{this.state.language}</div>
-        <div>en lang tekst som er en artikkel{this.state.text}</div>
-        <div>BILDE{this.state.image}</div>
-        <div>VIDEO{this.state.video}</div>
-<div>category{this.state.category}</div>*/}
-    </div>}
-    else{
-      return <div>
-      <div class="card" style={{width: "100%"}}>
-  <ul class="list-group list-group-flush">
-  <li class="list-group-item">
-<button class="btn btn-primary btn-sm" style={{width: "100%"}} type="button" data-toggle="collapse" data-target={"#collapseExample"+this.props.id} aria-expanded="false" aria-controls="collapseExample">
-<h1>Tittel{this.state.title}</h1>
-</button>
-<div class="collapse" id={"collapseExample"+this.props.id}>
-<div class="card card-body">
-  <li class="list-group-item"><h6 class="card-subtitle mb-2 text-muted">abstract{this.state.abstract}</h6></li>
-  <li class="list-group-item"><img src="..." class="card-img-top" alt="..."/></li>
-  <li class="list-group-item"><div>en lang tekst som er en artikkel{this.state.text}</div></li>
-  <li class="list-group-item">author{this.state.author}</li>
-  <li class="list-group-item">language{this.state.language}</li>
-  <li class="list-group-item">category{this.state.category}</li>
-  <li class="list-group-item">VIDEO{this.state.video}</li>
-  <li class="list-group-item">timestamp{this.state.timestamp}</li>
-  <li class="list-group-item">aid{this.state.aid}</li>
-  <li class="list-group-item"><a href="#" class="badge badge-primary">article_tags{this.state.article_tags}</a></li>
-</div>
-</div>
-  </li>
-</ul>
-</div>
-</div>
+    getCompressedView(){
+        return( 
+            <div className="card text-left mt-4" onClick={this.toggleCompress}>
+                <span className="col-1"/>
+                <div className="col">
+                    <div className="row">
+                        <h2 className="col-10 ml-1 mt-2">{this.state.title}</h2>
+                    </div>
+                    <div className="row">
+                        <p className="col ml-1 font-weight-lighter">{this.state.timestamp}</p>
+                    </div>
+                    <div className="row">
+                        <p className="col">{this.state.text}</p>
+                    </div>
+                </div>
+                <span className="col-1"/>
+            </div>
+        )
     }
-  }
-}
+
+    toggleCompress = () =>{
+        this.setState({compressed: !this.state.compressed})
+    }
+
+    getFullView(){
+        return(
+            <div className="card text-left mt-4" onClick={this.toggleCompress}>
+                <span className="col-1"/>
+                <div className="col">
+                    <div className="row mt-3">
+                        <img className="col" src="https://tse3-mm.cn.bing.net/th/id/OIP.BFzdEk9ZBP23QuzfF9RYJgHaFj?w=231&h=171&c=7&o=5&dpr=2&pid=1.7"></img>
+                    </div>
+                    <div className="row">
+                        <h2 className="col ml-1 mt-2">{this.state.title}</h2>
+                        <p className="col-2 mt-2 font-weight-lighter">{this.state.timestamp}</p>
+
+                    </div>
+                    <div className="row">
+                        <p className="col ml-1 font-weight-light">by {this.state.author}</p>
+                    
+                    </div>
+                    <div className="row">
+                        <p className="col">{this.state.abstract}</p>
+                    </div>                    
+                    <div className="row">
+                        <p className="col">{this.state.text}</p>
+                    </div>
+                </div>
+                <span className="col-1"/>
+            </div>
+        )
+    }
+    render (){
+            if(this.state.compressed){
+                return(
+                    this.getCompressedView()
+                )
+                }
+            else{
+                return(
+                    this.getFullView()
+                )
+            }
+    }
+    }
