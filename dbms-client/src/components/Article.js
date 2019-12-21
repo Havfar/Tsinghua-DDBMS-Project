@@ -18,12 +18,18 @@ constructor(props) {
     text: undefined,
     image: undefined,
     video: undefined,
-    category: undefined
+    category: undefined,
+    compressed: undefined
     }
 }   
 
 
 componentDidMount(){
+
+  // Is it compressed?
+  this.setState({
+    compressed: this.props.compressed
+  })
 
     const url = 'http://localhost:5000/load_article/?aid=' + this.props.aid+"&uid="+this.props.uid;
     fetch(url, {
@@ -51,8 +57,8 @@ componentDidMount(){
     }));
 }
 
-    // display the user in a div
     render () {
+      if(!this.state.compressed){
     return <div>
         <div class="card" style={{width: "100%"}}>
     <ul class="list-group list-group-flush">
@@ -62,11 +68,11 @@ componentDidMount(){
     <li class="list-group-item"><div>en lang tekst som er en artikkel{this.state.text}</div></li>
     <li class="list-group-item">
     <p>
-  <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+  <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#exampleCollapse" aria-expanded="false" aria-controls="collapseExample">
     <h5>extra information</h5>
   </button>
 </p>
-<div class="collapse" id="collapseExample">
+<div class="collapse" id="exampleCollapse">
   <div class="card card-body">
   <ul class="list-group list-group-flush">
     <li class="list-group-item">author{this.state.author}</li>
@@ -94,6 +100,33 @@ componentDidMount(){
         <div>BILDE{this.state.image}</div>
         <div>VIDEO{this.state.video}</div>
 <div>category{this.state.category}</div>*/}
-    </div>
+    </div>}
+    else{
+      return <div>
+      <div class="card" style={{width: "100%"}}>
+  <ul class="list-group list-group-flush">
+  <li class="list-group-item">
+<button class="btn btn-primary btn-sm" style={{width: "100%"}} type="button" data-toggle="collapse" data-target={"#collapseExample"+this.props.id} aria-expanded="false" aria-controls="collapseExample">
+<h1>Tittel{this.state.title}</h1>
+</button>
+<div class="collapse" id={"collapseExample"+this.props.id}>
+<div class="card card-body">
+  <li class="list-group-item"><h6 class="card-subtitle mb-2 text-muted">abstract{this.state.abstract}</h6></li>
+  <li class="list-group-item"><img src="..." class="card-img-top" alt="..."/></li>
+  <li class="list-group-item"><div>en lang tekst som er en artikkel{this.state.text}</div></li>
+  <li class="list-group-item">author{this.state.author}</li>
+  <li class="list-group-item">language{this.state.language}</li>
+  <li class="list-group-item">category{this.state.category}</li>
+  <li class="list-group-item">VIDEO{this.state.video}</li>
+  <li class="list-group-item">timestamp{this.state.timestamp}</li>
+  <li class="list-group-item">aid{this.state.aid}</li>
+  <li class="list-group-item"><a href="#" class="badge badge-primary">article_tags{this.state.article_tags}</a></li>
+</div>
+</div>
+  </li>
+</ul>
+</div>
+</div>
+    }
   }
 }
