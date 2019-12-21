@@ -47,6 +47,56 @@ class HiveClient:
             users.append(user)
         result = cur.fetchall()
         return result
+    
+    def get_all_users(self, region, page_size=None, page_number=None):
+        cur = self.conn.cursor()
+        query = 'select * from users where region ="' + region + '"' 
+        if page_size != None and page_number != None:
+            query += ' limit ' + str(page_size) + ' offset ' + str(page_number*page_size)
+        cur.execute(query)
+        result = cur.fetchall()
+        user_list = []
+        for item in result:
+            user_list.append(User(
+                uid=item[0], 
+                timestamp = item[1], 
+                name = item[2], 
+                gender=item[3], 
+                email = item[4],
+                phone = item[5], 
+                dept = item[6], 
+                language = item[7], 
+                role = item[8], 
+                prefer_tags = item[9], 
+                obtained_credits = item[10], 
+                age = item[11], 
+                region = item[12])
+            )
+        return user_list
+    
+    def get_all_articles(self, category, page_size=None, page_number=None):
+        cur = self.conn.cursor()
+        query = 'select * from articles where category ="' + category + '"' 
+        if page_size != None and page_number != None:
+            query += ' limit ' + str(page_size) + ' offset ' + str(page_number*page_size)
+        cur.execute(query)
+        result = cur.fetchall()
+        article_list = []
+        for article in result:
+            article_list.append(Article(
+                aid=article[0], 
+                timestamp = article[1], 
+                title = article[2], 
+                abstract=article[3], 
+                article_tags = article[4],
+                author = article[5], 
+                language = article[6], 
+                text = article[7], 
+                image = article[8], 
+                video = article[9], 
+                category = article[10])
+            )
+        return article_list
 
     # Used for local testing
     def get_all_tables(self):
@@ -303,4 +353,5 @@ def pretty_print(input):
 
 
 #print("setting up connection " , config.host_name, config.port)
-#client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+print(client.get_all_articles("technology"))
