@@ -13,7 +13,7 @@ export default class ClientSite extends React.Component {
             visible: true,
             SAid: undefined,
             SUid: undefined,
-            TypeSearch: "allUsers",
+            TypeSearch: "user",
             hideSearchBar: false,
             toDoList: ["per", "paal", "askeladden"],
             currentPageNumber : 1
@@ -25,30 +25,33 @@ export default class ClientSite extends React.Component {
         this.setState({hideSearchBar : !this.state.hideSearchBar})
     }
 
-    callBackSearch = (data) => {
-        switch(data.TypeSearch){
+    callBackSearch = (TypeSearch, searchString, region, category) => {
+        switch(TypeSearch){
             case "article":
                 this.setState({
-                    SAid: data.SAid,
-                    SUid: data.SUid,
-                    TypeSearch: data.TypeSearch
+                    SAid: searchString,
+                    TypeSearch: TypeSearch,
+                    category: category
                 }
                 )
                 break;
             case "user":
                 this.setState({
-                    SUid: data.SUid,
-                    TypeSearch: data.TypeSearch
+                    SUid: searchString,
+                    TypeSearch: TypeSearch,
+                    region: region
                 })
                 break;
             case "allArticles":
                 this.setState({
-                    TypeSearch: data.TypeSearch
+                    TypeSearch: TypeSearch,
+                    category: category
                 })
                 break;
             case "allUsers":
                 this.setState({
-                    TypeSearch: data.TypeSearch
+                    TypeSearch: TypeSearch,
+                    region: region
                 })
                 break;
             default:
@@ -189,7 +192,6 @@ export default class ClientSite extends React.Component {
             return  <div>
                         <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                         <User/>
-
                     </div>
         }
     }

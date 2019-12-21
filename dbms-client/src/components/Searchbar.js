@@ -47,9 +47,9 @@ export default class SearchBar extends React.Component  {
         return(
             <div className="row mt-3">
                 <span className="col"/>
-                <label className="radio-inline col"><input type="radio" name="optradio" checked={this.state.category==="Technology"} onChange={this.changeCategory} value="Beijing"/> &nbsp;Technology</label>
+                <label className="radio-inline col"><input type="radio" name="optradio" checked={this.state.category==="Technology"} onChange={this.changeCategory} value="Technology"/> &nbsp;Technology</label>
                 <span className="col"/>
-                <label className="radio-inline col"><input type="radio" name="optradio" checked={this.state.category==="Science"} onChange={this.changeCategory} value="Hong Kong"/>&nbsp; Science </label>
+                <label className="radio-inline col"><input type="radio" name="optradio" checked={this.state.category==="Science"} onChange={this.changeCategory} value="Science"/>&nbsp; Science </label>
                 <span className="col"/>
             </div>
         )
@@ -70,11 +70,24 @@ export default class SearchBar extends React.Component  {
     }
 
     search(){
+        let TypeSearch = ""
+        let searchString = ""
         if(this.state.searchCategory === "Users"){
-            this.state.parent.testConsole("users " + this.state.search.toString()+  ", " +this.state.region.toString())
+            if(this.state.search === ""){
+                TypeSearch = "allUsers"
+            }else{
+                TypeSearch = "user"
+
+            }
         }else if(this.state.searchCategory === "Articles"){
-            this.state.parent.testConsole("Articles " + this.state.search + ", " + this.state.category)
+            if(this.state.search === ""){
+                TypeSearch = "allArticles"
+
+            }else{
+                TypeSearch = "article"
+            }
         }
+        this.state.parent.callBackSearch(TypeSearch, this.state.searchString, this.state.region, this.state.category)
     }
 
     getComponentClassName(){
