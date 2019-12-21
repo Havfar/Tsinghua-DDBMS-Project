@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import Article from './Article';
 import User from './User';
 import SearchBar from './Searchbar';
+import NavBar from './NavBar';
 
 
 export default class ClientSite extends React.Component {
@@ -16,7 +17,8 @@ export default class ClientSite extends React.Component {
             TypeSearch: "user",
             hideSearchBar: false,
             toDoList: ["per", "paal", "askeladden"],
-            currentPageNumber : 1
+            currentPageNumber : 1,
+            loggedInUser: undefined
         }  
     }
 
@@ -120,79 +122,93 @@ export default class ClientSite extends React.Component {
             return items
     }
 
-    render () {
-        let TypeSearch = this.state.TypeSearch;
-        if(TypeSearch == "article"){
-            return  <div>
+    callBackLoggedInUser = (loggedInUser) =>{
+        this.setState({
+            loggedInUser: loggedInUser
+        }, alert("You have logged in as user: " + loggedInUser))
+    }
+
+    genClientSite = (TypeSearch) => {
+        let items = undefined
+        switch(TypeSearch){
+            case "article":
+                return  <div>
                         <SearchBar parent={this} hide={this.state.hideSearchBar} callBackSearch={this.callBackSearch}/>
                         <Article aid={this.state.SAid} uid={this.state.SUid} compressed={false}></Article>
                         <User articleMode={true}></User>
                     </div>
-        }
-        else if (TypeSearch == "user"){
-            return  <div>
+            case "user":
+                return  <div>
                         <SearchBar parent={this}callBackSearch={this.callBackSearch}/>
                         <User uid={this.state.SUid}></User>
                     </div>
-        }
-        else if (TypeSearch == "allArticles"){
-            const items = this.genArticles(this.state.toDoList)
-            return  <div>
-                <p>{this.state.TypeSearch}</p>
-                        <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
-                        <div>{items}</div>
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Previous" onClick={ () => this.pageNumberClicked("previous")}>
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                                    <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(1)}>1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(2)}>2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(3)}>3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Next" onClick={ () => this.pageNumberClicked("next")}>
-                                    <   span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                        <User articleMode={true}/>
-                    </div>
-        }
-        else if (TypeSearch == "allUsers"){
-            const items = this.genUsers(this.state.toDoList)
+            case "allArticles":
+                items = this.genArticles(this.state.toDoList)
+                return  <div>
+                    <p>{this.state.TypeSearch}</p>
+                            <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                            <div>{items}</div>
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" aria-label="Previous" onClick={ () => this.pageNumberClicked("previous")}>
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(1)}>1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(2)}>2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(3)}>3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" aria-label="Next" onClick={ () => this.pageNumberClicked("next")}>
+                                        <   span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <User articleMode={true}/>
+                        </div>
+            case "allUsers":
+                items = this.genUsers(this.state.toDoList)
+                return  <div>
+                            <p>{this.state.TypeSearch}</p>
+                            <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                            <div>{items}</div>
 
-            return  <div>
-                        <p>{this.state.TypeSearch}</p>
-                        <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
-                        <div>{items}</div>
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" aria-label="Previous" onClick={ () => this.pageNumberClicked("previous")}>
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(1)}>1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(2)}>2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(3)}>3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" aria-label="Next" onClick={ () => this.pageNumberClicked("next")}>
+                                        <   span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+            case "default":
+                return <div>
+                            <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                            <User/>
+                        </div>
+        }
+    }
 
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Previous" onClick={ () => this.pageNumberClicked("previous")}>
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                                    <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(1)}>1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(2)}>2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(3)}>3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Next" onClick={ () => this.pageNumberClicked("next")}>
-                                    <   span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+    render () {
+        return  <div>
+                    <NavBar callBackLoggedInUser={this.callBackLoggedInUser}/>
+                    <div class="container">
+                            <div class="row">
+                                <div class="col-lg-12 text-center"></div>
+                                    {this.genClientSite(this.state.TypeSearch)}
+                                </div>
+                            </div>
                     </div>
-        }
-        else{
-            return  <div>
-                        <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
-                        <User/>
-                    </div>
-        }
     }
 }
