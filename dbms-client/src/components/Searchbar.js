@@ -10,7 +10,7 @@ export default class SearchBar extends React.Component  {
             alternatives: ["Users", "Articles"],
             region: "Beijing",
             category: "Technology",
-            search: "frae",
+            search: "",
             parent: props.parent,
         };
         console.log(props)
@@ -71,7 +71,7 @@ export default class SearchBar extends React.Component  {
 
     search(){
         let TypeSearch = ""
-        console.log(this.state.searchString)
+        let searchString = ""
         if(this.state.searchCategory === "Users"){
             if(this.state.search === ""){
                 TypeSearch = "allUsers"
@@ -87,7 +87,7 @@ export default class SearchBar extends React.Component  {
                 TypeSearch = "article"
             }
         }
-        this.state.parent.callBackSearch(TypeSearch, this.state.searchString, this.state.region, this.state.category)
+        this.state.parent.callBackSearch(TypeSearch, this.state.search, this.state.region, this.state.category)
     }
 
     getComponentClassName(){
@@ -105,11 +105,10 @@ export default class SearchBar extends React.Component  {
             <div className={this.getComponentClassName()} >
                 <div className="row">
                     {this.getCategorySelection()}
-                    <input className="form-control col" type="text" placeholder="Search" aria-label="Search" onChange={e => this.setState({searchString: e.target.value})}/>
+                    <input className="form-control col" type="text" placeholder="Search" aria-label="Search" onChange={e => this.setState({search: e.target.value})}/>
                     <button type="button" className="btn btn-primary col-1 ml-1" data-toggle="button" aria-pressed="false" onClick={() =>this.search()}>
                         Search
                     </button>
-
                 </div>
                 {this.getSearchOptions()}
             </div>
