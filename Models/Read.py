@@ -35,7 +35,6 @@ class Read:
     def __str__(self):
         return  "(" + \
             "\"" + self.rid + "\", " + \
-            "\"" + self.uid + "\", " + \
             "\"" + self.aid + "\", " + \
             "\"" + self.timestamp + "\", " + \
             "\"" + str(self.read_or_not) + "\", " + \

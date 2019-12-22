@@ -13,7 +13,7 @@ import uuid
 import datetime
 import numpy as np
 import config
-
+import utils
 class HiveClient:
     def __init__(self, host_name, portNumber, user, password ):
         self.conn = hive.Connection(host=host_name, port=portNumber, username=user, password=password,
@@ -138,7 +138,7 @@ class HiveClient:
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-        cur.execute('insert into table user_read values' + read.__str__())
+        cur.execute('insert into table read partition("' + read.uid +'") values' + read.__str__())
 
     # Input: Be_read object
     def create_be_read(self, be_read):
@@ -284,16 +284,16 @@ class HiveClient:
         articles = []
         for item in output:
             a = Article(
-                aid=item[2],
-                timestamp=item[3],
-                title=item[4],
-                abstract=item[5],
-                article_tags=item[6],
-                author=item[7],
-                language=item[8],
-                text=item[9],
-                image=item[10],
-                video=item[11],
+                aid=item[0],
+                timestamp=item[1],
+                title=item[2],
+                abstract=item[3],
+                article_tags=item[4],
+                author=item[5],
+                language=item[6],
+                text=item[7],
+                image=item[8],
+                video=item[9],
             )
             articles.append(a)
         return articles
