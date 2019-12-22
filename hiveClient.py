@@ -257,7 +257,7 @@ class HiveClient:
         for item in output:
             user = User(
                 uid=item[0],
-                timestamp=item[1],
+                timestamp=str(item[1]),
                 name=item[2],
                 gender=item[3],
                 email=item[4],

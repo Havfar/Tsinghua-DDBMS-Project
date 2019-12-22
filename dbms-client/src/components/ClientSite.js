@@ -326,10 +326,10 @@ queryFlaskServer = (url) => {
             default:
                 return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
-                            {this.state.singleUser}
-                            {this.state.singleArticle}
-                            {this.state.users}
-                            {this.state.articles}
+                        {this.state.singleUser}
+                        {this.state.singleArticle}
+                        {this.state.users}
+                        {this.state.articles}
                 </div>
                 
         }
