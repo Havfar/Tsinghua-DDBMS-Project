@@ -303,28 +303,28 @@ queryFlaskServer = (url) => {
 
         switch(this.state.TypeSearch){
             case "user":
-                return <div>
+                return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.singleUser}
                 </div>
             case "article":
-                return <div>
+                return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.singleArticle}
                 </div>
             case "allUsers":
-                return <div>
+                return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.users}
                 </div>
             case "allArticles":
-                return <div>
+                return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.articles}
                 </div>
                 // no TypeSearch eg initial load of site
             default:
-                return <div>
+                return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                             {this.state.singleUser}
                             {this.state.singleArticle}
@@ -359,7 +359,6 @@ queryFlaskServer = (url) => {
                     <NavBar callBackLoggedInUser={this.callBackLoggedInUser} parent={this}/>
                     <div class="container mt-5">
                             <div class="row">
-                                <div class="col-lg-12 text-center"></div>
                                     {this.getAcitveComponent()}
                                     {/* {this.genClientSite(this.state.TypeSearch)} */}
                                     {/* {this.getPopularRank()} */}
