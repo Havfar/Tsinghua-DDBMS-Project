@@ -90,14 +90,33 @@ def gen_an_article (i):
         video = ""
     )
 
+
 # Used to create unique ids to Articles/ Users / Reads/ be_reads / pop_rank
 def create_id(prefix):
     return prefix + str(uuid.uuid4())
 
+
 def get_current_timestamp():
     return str(datetime.datetime.now())[:-3]
 
-print(get_current_timestamp())
+
+def get_last_day_timestamp():
+    today = datetime.datetime.now()
+    last_day = today - datetime.timedelta(days=1)
+    return str(last_day)[:-3]
+
+
+def get_last_week_timestamp():
+    today = datetime.datetime.now()
+    last_week = today - datetime.timedelta(days=7)
+    return str(last_week)[:-3]
+
+
+def get_last_month_timestamp():
+    today = datetime.datetime.now()
+    last_month = today - datetime.timedelta(days=30)
+    return str(last_month)[:-3]
+
 
 def gen_an_user (i):
     user = {}
@@ -173,5 +192,5 @@ def bin_to_img(bin_str):
     img = Image.frombytes(data=bin_str)
     return img
 
-
+get_last_weeks_timestamp()
 

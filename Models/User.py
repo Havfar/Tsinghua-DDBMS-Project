@@ -44,7 +44,7 @@ class User:
         # "\"" + self.region+ "\", " + \
         return  "(" + \
             "\"" + self.uid + "\", " + \
-            "\"" + self.timestamp + "\", " + \
+            "\"" + str(self.timestamp) + "\", " + \
             "\"" + self.name + "\", " + \
             "\"" + self.gender + "\", " + \
             "\"" + self.email + "\", " + \
