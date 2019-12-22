@@ -192,5 +192,19 @@ def bin_to_img(bin_str):
     img = Image.frombytes(data=bin_str)
     return img
 
-get_last_weeks_timestamp()
+def get_last_day_timestamp():
+    today = datetime.datetime.now()
+    last_day = today - datetime.timedelta(days=1)
+    return str(last_day)[:-3]
 
+
+def get_last_week_timestamp():
+    today = datetime.datetime.now()
+    last_week = today - datetime.timedelta(days=7)
+    return str(last_week)[:-3]
+
+
+def get_last_month_timestamp():
+    today = datetime.datetime.now()
+    last_month = today - datetime.timedelta(days=30)
+    return str(last_month)[:-3]
