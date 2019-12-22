@@ -19,30 +19,20 @@ export default class Article extends React.Component {
             }
         }   
     componentDidMount(){
-        const url = 'http://localhost:5000/load_article/?aid=' + this.props.aid+"&uid="+this.props.uid;
-        fetch(url, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type':'application/json'
-            }
+       this.setState({
+            aid: this.props.aid,
+            timestamp: this.propsdata.timestamp,
+            title: this.propsdata.title,
+            abstract: this.propsdata.abstract,
+            article_tags: this.propsdata.article_tags,
+            author: this.propsdata.author,
+            language: this.propsdata.language,
+            text: this.propsdata.text,
+            image: this.propsdata.image,
+            video: this.propsdata.video,
+            category: this.propsdata.category,
+            compressed: this.props.compressed
         })
-        .then(response => response.json())
-        .then(data => this.setState({
-            aid: data.aid,
-            timestamp: data.timestamp,
-            title: data.title,
-            abstract: data.abstract,
-            article_tags: data.article_tags,
-            author: data.author,
-            language: data.language,
-            text: data.text,
-            image: data.image,
-            video: data.video,
-            category: data.category
-        }));
     }
 
     getCompressedView(){

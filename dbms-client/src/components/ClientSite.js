@@ -15,58 +15,251 @@ export default class ClientSite extends React.Component {
             visible: true,
             SAid: undefined,
             SUid: undefined,
-            TypeSearch: "article",
+            TypeSearch: undefined,
             hideSearchBar: false,
             toDoList: ["per", "paal", "askeladden"],
             currentPageNumber : 1,
             activeComponent:'clientSite',
-            loggedInUser: undefined
+            loggedInUser: undefined,
+            fetchedData: undefined,
+            url: undefined,
+            loadingFinished: undefined,
+            users: undefined,
+            articles: undefined,
+            singleUser: undefined,
+            singleArticle: undefined,
         }  
     }
 
-    toggleSearchBar = () =>{
-        console.log(this.state.hideSearchBar)
-        this.setState({hideSearchBar : !this.state.hideSearchBar})
-    }
-
-    callBackSearch = (TypeSearch, searchString, region, category) => {
-        console.log(searchString)
-        switch(TypeSearch){
-            case "article":
-                this.setState({
-                    SAid: searchString,
-                    TypeSearch: TypeSearch,
-                    category: category
-                }
-                )
-                break;
-            case "user":
-                this.setState({
-                    SUid: searchString,
-                    TypeSearch: TypeSearch,
-                    region: region
-                })
+    componentDidMount(){
+        // what is state?
+        // what do we want to generate?
+        switch(this.state.TypeSearch){
+            case "allUsers":
+                this.genUsers()
                 break;
             case "allArticles":
-                this.setState({
-                    TypeSearch: TypeSearch,
-                    category: category
-                })
+                this.genArticles()
                 break;
-            case "allUsers":
-                this.setState({
-                    TypeSearch: TypeSearch,
-                    region: region
-                })
+            case "article":
+                this.genArticle()
+                break;
+            case "user":
+                this.genUser()
                 break;
             default:
                 break;
         }
     }
 
+    componentDidUpdate(){
+        // what is state?
+        // what do we want to generate?
+        switch(this.state.TypeSearch){
+            case "allUsers":
+                this.genUsers()
+                break;
+            case "allArticles":
+                this.genArticles()
+                break;
+            case "article":
+                this.genArticle()
+                break;
+            case "user":
+                this.genUser()
+                break;
+            default:
+                break;
+        }
+    }
 
-    testConsole(search){
-        console.log(search)
+    genUsers = async() => {
+        try {
+            let data = await fetch(this.state.url, {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+            }).then(response => response.json())
+
+            // this will re render the view with new data
+            this.setState({
+                TypeSearch: undefined,
+              users: data.map((jsonUser, i) => (
+                <User uid={jsonUser.uid} timestamp={jsonUser.timestamp} name={jsonUser.name} gender={jsonUser.gender} email={jsonUser.email} phone={jsonUser.phone} dept={jsonUser.dept} language={jsonUser.language} region={jsonUser.region} role={jsonUser.region} role={jsonUser.role} prefer_tags={jsonUser.prefer_tags} obtained_credits={jsonUser.obtained_credits} age={data.age} compressed={true} collapseTarget={i} id={i}/>
+              ))
+
+        })
+    }catch (err) {
+        console.log(err);
+      }
+    }
+
+genArticles = async() => {
+        try {
+            let data = await fetch(this.state.url, {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+            }).then(response => response.json())
+
+            // this will re render the view with new data
+            this.setState({
+                TypeSearch: undefined,
+              articles: data.map((jsonArticle, i) => (
+                <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={i} id={i}/>
+              ))
+        })
+    }catch (err) {
+        console.log(err);
+      }
+}
+
+genUser = async(url) => {
+    try {
+        let jsonUser = await fetch(this.state.url, {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+              'Content-Type': 'application/json'
+            }
+        }).then(response => response.json())
+
+        // this will re render the view with new data
+        this.setState({
+            TypeSearch: undefined,
+          singleUser: 
+          <User uid={jsonUser.uid} timestamp={jsonUser.timestamp} name={jsonUser.name} gender={jsonUser.gender} email={jsonUser.email} phone={jsonUser.phone} dept={jsonUser.dept} language={jsonUser.language} region={jsonUser.region} role={jsonUser.region} role={jsonUser.role} prefer_tags={jsonUser.prefer_tags} obtained_credits={jsonUser.obtained_credits} age={jsonUser.age} compressed={false} collapseTarget={1} id={1}/>
+        })
+}catch (err) {
+    console.log(err);
+  }
+}
+
+genArticle = async(url) => {
+    try {
+        let jsonArticle = await fetch(this.state.url, {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+              'Content-Type': 'application/json'
+            }
+        }).then(response => response.json())
+
+        // this will re render the view with new data
+        this.setState({
+            TypeSearch: undefined,
+          singleArticle: 
+          <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={1} id={1}/>
+
+        })
+}catch (err) {
+    console.log(err);
+  }
+}
+
+toggleSearchBar = () =>{
+        console.log(this.state.hideSearchBar)
+        this.setState({hideSearchBar : !this.state.hideSearchBar})
+}
+
+queryFlaskServer = (url) => {
+        fetch(url, {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+              'Content-Type': 'application/json'
+            }
+        })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data)
+        return(data)
+    });
+
+    }
+
+    callBackSearch = async (TypeSearch, searchString, region, category) => {
+        let url = ""
+        switch(TypeSearch){
+            case "article":
+                url = 'http://localhost:5000/load_article/?aid=' + searchString + "&uid="+this.state.loggedInUser
+                this.setState({
+                    SAid: searchString,
+                    TypeSearch: TypeSearch,
+                    category: category,
+                    url: url,
+                    searchString: searchString
+                }
+                )
+                break;
+            case "user":
+                url = 'http://localhost:5000/load_user/?uid=' + searchString
+                this.setState({
+                    SUid: searchString,
+                    TypeSearch: TypeSearch,
+                    region: region,
+                    category: category,
+                    url: url,
+                    searchString: searchString
+                })
+                break;
+            case "allArticles":
+                url = 'http://localhost:5000/load_all_articles'
+                this.setState({
+                    TypeSearch: TypeSearch,
+                    category: category,
+                    region: region,
+                    category: category,
+                    url: url,
+                    searchString: searchString
+                });
+                break;
+            case "allUsers":
+                url = 'TODO'
+                this.setState({
+                    TypeSearch: TypeSearch,
+                    region: region,
+                    category: category,
+                    url: url,
+                    searchString: searchString
+                })
+                break;
+            case "readByUser":
+                url = 'http://localhost:5000/user_read_table/?uid=' + searchString
+                this.setState({
+                    TypeSearch: TypeSearch,
+                    region: region,
+                    category: category,
+                    url: url,
+                    searchString: searchString
+                })
+                break;
+            case "articleReadByUsers":
+                url = 'http://localhost:5000/be_read_by_aid/' + searchString
+                this.setState({
+                    TypeSearch: TypeSearch,
+                    region: region,
+                    category: category,
+                    url: url,
+                    searchString: searchString
+                })
+            default:
+                break;
+        }
     }
 
     pageNumberClicked = (number) => {
@@ -75,7 +268,7 @@ export default class ClientSite extends React.Component {
             this.setState({
                 currentPageNumber : this.state.currentPageNumber+1
             }, () => {
-                alert("changed to page:" + number + " now on page:" + this.state.currentPageNumber)
+                //alert("changed to page:" + number + " now on page:" + this.state.currentPageNumber)
     
             })
         }
@@ -85,7 +278,7 @@ export default class ClientSite extends React.Component {
                 this.setState({
                     currentPageNumber : this.state.currentPageNumber-1
                 }, () => {
-                    alert("changed to page:" + number + " now on page:" + this.state.currentPageNumber)
+                    //alert("changed to page:" + number + " now on page:" + this.state.currentPageNumber)
         
                 })
             }
@@ -98,107 +291,47 @@ export default class ClientSite extends React.Component {
 
         })}
     }
-
-    genArticles = (someList) => {
-        let counter = 0;
-        const items = someList.map((item) => {
-            counter += 1;
-            return (
-                <Article collapseTarget={counter} id={counter}/>
-            )}
-            )
-            counter += 1;
-            return items
-    }
-
-    genUsers = (someList) => {
-        let counter = 0;
-        const items = someList.map((item) => {
-            counter += 1;
-            return <li>
-                {counter}
-                <User compressed={true} item={item} collapseTarget={counter} id={counter}/>
-            </li>}
-            )
-            counter += 1;
-            return items
-    }
-
+   
     callBackLoggedInUser = (loggedInUser) =>{
         this.setState({
             loggedInUser: loggedInUser
         }, alert("You have logged in as user: " + loggedInUser))
     }
 
-    genClientSite = (TypeSearch) => {
-        let items = undefined
-        switch(TypeSearch){
-            case "article":
-                return  <div>
-                        <SearchBar parent={this} hide={this.state.hideSearchBar} callBackSearch={this.callBackSearch}/>
-                        <Article aid={this.state.SAid} uid={this.state.SUid} compressed={false}></Article>
-                        <User articleMode={true}></User>
-                    </div>
-            case "user":
-                return  <div>
-                        <SearchBar parent={this}callBackSearch={this.callBackSearch}/>
-                        <User uid={this.state.SUid}></User>
-                    </div>
-            case "allArticles":
-                items = this.genArticles(this.state.toDoList)
-                return  <div>
-                    <p>{this.state.TypeSearch}</p>
-                            <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
-                            <div>{items}</div>
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination">
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Previous" onClick={ () => this.pageNumberClicked("previous")}>
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>
-                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(1)}>1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(2)}>2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(3)}>3</a></li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Next" onClick={ () => this.pageNumberClicked("next")}>
-                                        <   span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                            <User articleMode={true}/>
-                        </div>
-            case "allUsers":
-                items = this.genUsers(this.state.toDoList)
-                return  <div>
-                            <p>{this.state.TypeSearch}</p>
-                            <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
-                            <div>{items}</div>
+    genClientSite = () => {
+        // render site based on TypeSearch
 
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination">
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Previous" onClick={ () => this.pageNumberClicked("previous")}>
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>
-                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(1)}>1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(2)}>2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#" onClick={ () => this.pageNumberClicked(3)}>3</a></li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Next" onClick={ () => this.pageNumberClicked("next")}>
-                                        <   span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </div>
-            case "default":
+        switch(this.state.TypeSearch){
+            case "user":
                 return <div>
-                            <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
-                            <User/>
-                        </div>
+                    <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                    {this.state.singleUser}
+                </div>
+            case "article":
+                return <div>
+                    <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                    {this.state.singleArticle}
+                </div>
+            case "allUsers":
+                return <div>
+                    <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                    {this.state.users}
+                </div>
+            case "allArticles":
+                return <div>
+                    <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                    {this.state.articles}
+                </div>
+                // no TypeSearch eg initial load of site
+            default:
+                return <div>
+                    <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                            {this.state.singleUser}
+                            {this.state.singleArticle}
+                            {this.state.users}
+                            {this.state.articles}
+                </div>
+                
         }
     }
 

@@ -11,7 +11,9 @@ from Models.Article import Article
 from Models.Be_Read import Be_read
 from Models.Read import Read
 import random
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def hello_world():
@@ -119,6 +121,7 @@ def create_article():
 
     return "Article created"
 
+
 # returns article by aid on json format {}, also updates be_read table and requesting user read_table
 @app.route('/load_article/', methods = ['GET'])
 def load_article():
@@ -159,6 +162,8 @@ def load_article():
     return requested_article.__dict__
 
 
+
+
 # returns user object for given uid, returns json {}
 @app.route('/load_user/', methods = ['GET'])
 def load_user():
@@ -172,22 +177,24 @@ def load_user():
 
     # Get user from hive
     requested_user = client.get_user_by_uid(uid = uid, region=None)
-
+    print("user from client:", requested_user.__dict__)
     return requested_user.__dict__
 
 # returns be_read object holding all uid's that has read the article with given aid - json format {}
-@app.route('/be_read_by_aid', methods = ['GET'])
+@app.route('/be_read_by_aid/', methods = ['GET'])
 def be_read():
-    content = request.json
-    print("Content:", content)
+    aid = request.args.get('aid')
 
-    # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+    
+    # is a list of be_read objects
+    be_read_table = client.get_be_read_by_aid(aid = aid, page_size=None, page_number=None)
 
-    # Get Be_Read from hive
-    requested_Be_Read = client.get_be_read_by_aid(aid = content["aid"], page_size=None, page_number=None)
+    list_of_dicts = []
+    for be_read_obj in be_read_table:
+        list_of_dicts.append(be_read_obj.__dict__)
 
-    return requested_Be_Read.__dict__
+    return json.dumps(list_of_dicts)
 
 # Returns all articles read by the uid, returned as json [{}]
 @app.route('/user_read_table', methods = ['GET'])

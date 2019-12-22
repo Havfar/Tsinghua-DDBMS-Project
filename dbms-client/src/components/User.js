@@ -18,41 +18,34 @@ export default class User extends React.Component {
         prefer_tags: undefined,
         obtained_credits: undefined,
         showReads: false,
-        compressed: undefined
+        compressed: undefined,
+        collapseTarget: undefined,
+        id: undefined
         }
     }   
 
     componentDidMount(){
-
         this.setState({
-            compressed: this.props.compressed
+            uid: this.props.uid,
+            timestamp: this.props.timestamp,
+            name: this.props.name,
+            gender: this.props.gender,
+            email: this.props.email,
+            phone: this.props.phone,
+            dept: this.props.dept,
+            language: this.props.language,
+            role: this.props.role,
+            prefer_tags: this.props.prefer_tags,
+            obtained_credits: this.props.obtained_credits,
+            compressed: this.props.compressed,
+            collapseTarget: this.props.collapseTarget,
+            id: this.props.id
         })
-
-        const url = 'http://localhost:5000/load_user/?uid=' + this.props.uid;
-        fetch(url, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type':'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => this.setState({
-            uid: data.uid,
-            timestamp: data.timestamp,
-            name: data.name,
-            gender: data.gender,
-            email: data.email,
-            phone: data.phone,
-            dept: data.dept,
-            language: data.language,
-            role: data.role,
-            prefer_tags: data.prefer_tags,
-            obtained_credits: data.obtained_credits
-        })); 
     }
+
+componentWillReceiveProps(){
+    alert("user props:" + this.props)
+}
 
     toggleShowReads(){
         this.setState({showReads : !this.state.showReads})
