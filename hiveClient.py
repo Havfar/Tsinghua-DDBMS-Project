@@ -464,9 +464,9 @@ class HiveClient:
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-        if(time == "week"):
+        if(time == "weekly"):
             query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_week_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'
-        elif(time =="month"):
+        elif(time =="monthly"):
             query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_month_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'
         else:
             query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_day_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'

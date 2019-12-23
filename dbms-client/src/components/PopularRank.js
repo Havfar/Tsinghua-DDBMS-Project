@@ -31,16 +31,12 @@ export default class PopularRank extends React.Component {
     }
 
     componentDidUpdate(){
-        if(this.state.must_load_articles_from_list){
-            this.getArticlesFromList()
-        }
-
         if(this.state.shouldLoadArticles){
             this.loadArticles()
         }
 
     }
-
+/*
     getArticlesFromList = async() => {
         let list_of_articles = []
         for (const article_id of this.state.article_id_list){
@@ -68,12 +64,12 @@ export default class PopularRank extends React.Component {
           ))
         })
     }
-
+*/
 
     getPopularArticlesList = async() => {
         try {
-            let url = "http://localhost:5000/popular_rank/" + this.state.temporalGranularity
-            let article_id_list = await fetch(url, {
+            let url = "http://localhost:5000/popular_rank/?filter=" + this.state.temporalGranularity
+            let article_list = await fetch(url, {
                 method: 'GET', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -86,9 +82,9 @@ export default class PopularRank extends React.Component {
             // this will re render the view with new data
             this.setState({
                 shouldLoadArticles: false,
-                must_load_articles_from_list: true,
-              article_id_list: article_id_list 
-              //<Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={1} id={1}/>
+                topArticles: article_list.map((jsonArticle, i) => (
+                    <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={i} id={i}/>
+                  ))
             })
         }catch (err) {
             console.log(err);

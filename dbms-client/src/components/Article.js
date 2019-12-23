@@ -35,6 +35,8 @@ export default class Article extends React.Component {
             })
     }
 
+    com
+
     getCompressedView(){
         return( 
             <div className="card text-left mt-4" onClick={this.toggleCompress}>

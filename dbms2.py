@@ -243,18 +243,16 @@ def popular_rank():
     # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
-    # I think this is a list of article_ids
-    article_id_list = client.get_popularity_rank(filter)
+    # List of article objects
+    article_list = client.get_popularity_rank(filter)
 
-    # Need to fetch all articles objects for these id's
-    list_of_article_objects = []
+    article_dicts = []
+    for article in article_list:
+        article_dicts.append(article.__dict__)
 
-    for article_id in article_id_list:
-        article = client.get_article_by_aid(article_id, category=None)
-        list_of_article_objects.append(article)
 
     # return dump of the list (json) [{}]
-    return json.dumps(list_of_article_objects)
+    return json.dumps(article_dicts)
 
 
 if __name__ == '__main__':

@@ -40,7 +40,7 @@ class Article:
     def __str__(self):
         return  "(" + \
            "\"" + self.aid + "\", " + \
-           "\"" + self.timestamp + "\", " + \
+           "\"" + str(self.timestamp) + "\", " + \
            "\"" + self.title + "\", " + \
            "\"" + self.abstract + "\", " + \
            "\"" + self.article_tags + "\", " + \
