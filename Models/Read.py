@@ -36,11 +36,11 @@ class Read:
         return  "(" + \
             "\"" + self.rid + "\", " + \
             "\"" + self.aid + "\", " + \
-            "\"" + self.timestamp + "\", " + \
-            "\"" + str(self.read_or_not) + "\", " + \
+            "\"" + str(self.timestamp) + "\", " + \
+            "" + str(self.read_or_not) + ", " + \
             "\"" + str(self.read_time_length) + "\", " + \
             "\"" + str(self.read_sequence )+ "\", " + \
-            "\"" + str(self.agree_or_not) + "\", " + \
-            "\"" + str(self.comment_or_not) + "\", " + \
-            "\"" + str(self.share_or_not) + "\", " + \
+            "" + str(self.agree_or_not) + ", " + \
+            "" + str(self.comment_or_not) + ", " + \
+            "" + str(self.share_or_not) + ", " + \
             "\"" + str(self.comment_detail) + "\")"

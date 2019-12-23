@@ -38,15 +38,51 @@ class HiveClient:
 
     # Returns a list of all users whom have read the article
     # May need to change if it is not possible to update table row (e.g check for latest row)
-    def get_user_read_by_aid(self, aid, page_size=None, page_number = None):
+    def get_read_by_aid(self, aid, page_size=None, page_number = None):
         cur = self.conn.cursor()
-        cur.execute('select * from user_read where aid="' + aid + '"')
-        users:List[User] = []
-        for user in cur.fetchall():
-            user = User(input_string=user)
-            users.append(user)
-        result = cur.fetchall()
-        return result
+        cur.execute('set hive.support.concurrency=true')
+        cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
+        cur.execute('select * from read where aid="' + aid + '"')
+        reads:List[Read] = []
+        for read in cur.fetchall():
+            read = Read(
+                rid=read[0],
+                aid=read[1],
+                timestamp=read[2],
+                read_or_not=read[3],
+                read_time_length=read[4],
+                read_sequence=read[5],
+                agree_or_not=read[6],
+                comment_or_not=read[7],
+                share_or_not=read[8],
+                comment_detail=read[9],
+                uid=read[10],
+            )
+            reads.append(read)
+        return reads
+
+    def get_read_by_uid(self, uid, page_size=None, page_number = None):
+        cur = self.conn.cursor()
+        cur.execute('set hive.support.concurrency=true')
+        cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
+        cur.execute('select * from read where uid="' + uid + '"')
+        reads:List[Read] = []
+        for read in cur.fetchall():
+            read = Read(
+                rid=read[0],
+                aid=read[1],
+                timestamp=read[2],
+                read_or_not=read[3],
+                read_time_length=read[4],
+                read_sequence=read[5],
+                agree_or_not=read[6],
+                comment_or_not=read[7],
+                share_or_not=read[8],
+                comment_detail=read[9],
+                uid=read[10],
+            )
+            reads.append(read)
+        return reads
     
     def get_all_users(self, region, page_size=None, page_number=None):
         cur = self.conn.cursor()
@@ -156,10 +192,12 @@ class HiveClient:
 
     # Experimenting with joins
     # NOT FOR PRODUCTION
-    def get_user_read_table_by_user(self, user, page_size=None, page_number = None):
+    def experiment(self, user, page_size=None, page_number = None):
         cur = self.conn.cursor()
+        cur.execute('set hive.support.concurrency=true')
+        cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
         cur.execute('select  * '
-                    'from (select aid, uid from user_read where uid="' + user.uid +'") r '
+                    'from (select aid, uid from read where uid="' + user.uid +'") r '
                     'left outer join (select uid, name from user_table) usr '
                     'on ( r.uid = usr.uid) '
                     'left outer join (select aid, title from article_table) artcl '
@@ -168,11 +206,11 @@ class HiveClient:
         result = cur.fetchall()
         return result
 
-    def get_user_read_table_by_uid(self, uid, page_size=None, page_number = None):
+    def get_read_table_by_uid(self, uid, page_size=None, page_number = None):
         cur = self.conn.cursor()
-        query = 'select  * ' \
-                'from user_read  ' \
-                'where uid="' + uid + '"'
+        cur.execute('set hive.support.concurrency=true')
+        cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
+        query = 'select  * from read  where uid="' + uid + '"'
 
         if page_size != None and page_size != None:
             query += " limit " + str(page_size) + " offset " + str(page_number * page_size)
@@ -182,7 +220,7 @@ class HiveClient:
             read_list.append(Read(input_string = element))
         return read_list
 
-    def get_user_read_table_by_read(self, read, page_size=None, page_number = None):
+    def get_read_table_by_read(self, read, page_size=None, page_number = None):
         cur = self.conn.cursor()
         query = 'select  * ' \
                 'from (select aid, uid from read where id="' + read.id +'") r ' \
@@ -207,7 +245,7 @@ class HiveClient:
         result = cur.fetchall()[0]
         article = Article(
             aid=result[0],
-            timestamp=result[1],
+            timestamp= str(result[1]),
             title=result[2],
             abstract=result[3],
             article_tags=result[4],
@@ -230,7 +268,7 @@ class HiveClient:
         result = cur.fetchall()[0]
         user = User(
             uid = result[0],
-            timestamp=result[1],
+            timestamp= str(result[1]),
             name = result[2],
             gender = result[3],
             email=result[4],
@@ -285,7 +323,7 @@ class HiveClient:
         for item in output:
             a = Article(
                 aid=item[0],
-                timestamp=item[1],
+                timestamp= str(item[1]),
                 title=item[2],
                 abstract=item[3],
                 article_tags=item[4],
@@ -317,7 +355,7 @@ class HiveClient:
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-        cur.execute('select * from user_read where (user_read.aid ="' + aid + '" and user_read.uid = "'+ uid +'")')
+        cur.execute('select * from read where (read.aid ="' + aid + '" and read.uid = "'+ uid +'")')
         read = Read(input_string=str(cur.fetchall()))
         return read
 
@@ -337,7 +375,7 @@ class HiveClient:
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-        query = 'select * from user_read where (user_read.aid = "' + aid + '" and user_read.read_or_not = 1) order by var_timestamp desc'
+        query = 'select * from read where (read.aid = "' + aid + '" and read.read_or_not = 1) order by var_timestamp desc'
         if page_size != None and page_number != None:
             query += " limit " + str(page_size) + " offset " + str(page_number * page_size)
         cur.execute(query)
@@ -350,7 +388,7 @@ class HiveClient:
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-        cur.execute('update user_read set'
+        cur.execute('update read set'
                     + ' var_timestamp = ' + read.timestamp
                     + ', read_or_not = ' + read.read_or_not
                     + ', read_time_length = ' + read.read_time_length
@@ -359,7 +397,7 @@ class HiveClient:
                     + ', comment_or_not = ' + read.comment_or_not
                     + ', share_or_not = ' + read.share_or_not
                     + ', comment_detail = ' + read.comment_detail
-                    + ' where user_read.rid = "' + read.rid
+                    + ' where read.rid = "' + read.rid
                     )
 
 
@@ -442,7 +480,7 @@ class HiveClient:
         for item in result:
             a = Article(
                 aid=item[2],
-                timestamp=item[3],
+                timestamp=str(item[3]),
                 title=item[4],
                 abstract=item[5],
                 article_tags=item[6],
@@ -514,5 +552,12 @@ def get_last_month_timestamp():
 
 #print("setting up connection " , config.host_name, config.port)
 client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
-print(client.get_user_by_uid(uid="u679cda57-1e53-41d3-ac29-2d601af6e344", region="Beijing"))
-
+# print(client.get_user_by_uid(uid="u679cda57-1e53-41d3-ac29-2d601af6e344", region="Beijing"))
+r = Read(rid=utils.create_id("r"), aid="a875087a5-1231-4d0e-bebf-a2314586046d", uid="u679cda57-1e53-41d3-ac29-2d601af6e344", timestamp=utils.get_current_timestamp(), read_or_not=True, read_time_length=0, read_sequence=0, agree_or_not=False, comment_or_not=False, share_or_not=False, comment_detail="")
+#print(client.get_table_by_name('articles')[0][0])
+#user = client.get_user_by_uid()
+user = client.get_user_by_uid(uid="u679cda57-1e53-41d3-ac29-2d601af6e344")
+#client.create_read(read=r)
+#print(client.get_read(aid="a875087a5-1231-4d0e-bebf-a2314586046d", uid="u679cda57-1e53-41d3-ac29-2d601af6e344"))
+print(client.get_read_by_aid(aid="a875087a5-1231-4d0e-bebf-a2314586046d")[0])
+print(client.get_read_by_uid(uid="u679cda57-1e53-41d3-ac29-2d601af6e344")[0])
