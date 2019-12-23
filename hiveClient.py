@@ -1,4 +1,5 @@
 import datetime
+import random
 from typing import List
 
 from PIL import Image
@@ -164,10 +165,41 @@ class HiveClient:
         #cur.execute('insert into table user_table values' + user.__str__())
         cur.execute('insert into table users partition(region ="' + user.region + '") values' + user.__str__())
 
-    # Input: Article object
+    # Input: User object
+    def create_users(self, users, region):
+        cur = self.conn.cursor()
+        #cur.execute('insert into table user_table values' + user.__str__())
+        query = 'insert into table users partition(region ="' + region + '") values'
+        i = 1
+        for user in users:
+            query += '  ("' + user.uid +  '", "' + str(user.timestamp) + '", "' + user.name + '", "' + user.gender + '", "' + user.email + '", "' + user.phone + '", "' + user.dept + '", "' + user.language + '", "' + user.role + '", " ' + user.prefer_tags + '", ' + str(user.obtained_credits) + ', ' + str(user.age) + ')'
+            if(i != len(users)):
+                # query += '  union all '
+                query += ', '
+            i+=1
+        #print(query, len(users), i)
+        cur.execute(query)
+
+        # Input: Article object
+
     def create_article(self, article):
         cur = self.conn.cursor()
-        cur.execute('insert into table articles partition(category ="' + article.category + '") values' + article.__str__())
+        cur.execute(
+            'insert into table articles partition(category ="' + article.category + '") values' + article.__str__())
+        # Input: Article object
+
+    def create_articles(self, articles, category):
+        cur = self.conn.cursor()
+        query = 'insert into table articles partition(category ="' + category + '") values'
+        i = 1
+        for a in articles:
+            query += ' ("' + a.aid + '","' + a.timestamp+ '","' + a.title+ '","' + a.abstract+ '","' + a.article_tags+ '","' + a.author+ '","' + a.language+ '", "' + a.text+ '", "' + a.image+ '", "' + str(a.video) +'")'
+            if (i != len(articles)):
+                # query += '  union all '
+                query += ', '
+            i += 1
+        # print(query, len(users), i)
+        cur.execute(query)
 
     # Input: Read object
     def create_read(self, read):
@@ -465,11 +497,11 @@ class HiveClient:
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
         if(time == "weekly"):
-            query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_week_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'
+            query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + utils.get_last_week_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'
         elif(time =="monthly"):
-            query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_month_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'
+            query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + utils.get_last_month_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'
         else:
-            query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_day_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'
+            query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + utils.get_last_day_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'
 
         cur.execute(query)
 
@@ -532,32 +564,31 @@ def __pretty_print(input):
     for element in input:
         print(element)
 
-def get_last_day_timestamp():
-    today = datetime.datetime.now()
-    last_day = today - datetime.timedelta(days=1)
-    return str(last_day)[:-3]
-
-
-def get_last_week_timestamp():
-    today = datetime.datetime.now()
-    last_week = today - datetime.timedelta(days=7)
-    return str(last_week)[:-3]
-
-
-def get_last_month_timestamp():
-    today = datetime.datetime.now()
-    last_month = today - datetime.timedelta(days=30)
-    return str(last_month)[:-3]
-
 
 #print("setting up connection " , config.host_name, config.port)
 client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 # print(client.get_user_by_uid(uid="u679cda57-1e53-41d3-ac29-2d601af6e344", region="Beijing"))
 r = Read(rid=utils.create_id("r"), aid="a875087a5-1231-4d0e-bebf-a2314586046d", uid="u679cda57-1e53-41d3-ac29-2d601af6e344", timestamp=utils.get_current_timestamp(), read_or_not=True, read_time_length=0, read_sequence=0, agree_or_not=False, comment_or_not=False, share_or_not=False, comment_detail="")
-#print(client.get_table_by_name('articles')[0][0])
-#user = client.get_user_by_uid()
-user = client.get_user_by_uid(uid="u679cda57-1e53-41d3-ac29-2d601af6e344")
-#client.create_read(read=r)
-#print(client.get_read(aid="a875087a5-1231-4d0e-bebf-a2314586046d", uid="u679cda57-1e53-41d3-ac29-2d601af6e344"))
-print(client.get_read_by_aid(aid="a875087a5-1231-4d0e-bebf-a2314586046d")[0])
-print(client.get_read_by_uid(uid="u679cda57-1e53-41d3-ac29-2d601af6e344")[0])
+
+
+articles = []
+for i in range(50):
+    articles.append(utils.gen_an_article(i))
+
+#client.create_articles(articles, "Technology")
+# i = 0
+# for element in client.get_all_articles(category="Science"):
+#     if(i <7):
+#         br = Be_read(brid=utils.create_id("br"), aid=element.aid,
+#                      timestamp=utils.get_current_timestamp(), read_uid_list="", comment_num=0, comment_uid_list="",
+#                      agree_num=0, agree_uid_list="", share_num=0, share_uid_list="", read_num=random.randint(0,1000))
+#         client.create_be_read(be_read=br)
+#         r = Read(rid=utils.create_id("r"), aid=element.aid,
+#                  uid="u679cda57-1e53-41d3-ac29-2d601af6e344", timestamp=utils.get_current_timestamp(), read_or_not=True,
+#                  read_time_length=0, read_sequence=0, agree_or_not=False, comment_or_not=False, share_or_not=False,
+#                  comment_detail="")
+#         client.create_read(r)
+#         i +=1
+#
+#         print(i, element.aid)
+#client.create_be_read(be_read=br)

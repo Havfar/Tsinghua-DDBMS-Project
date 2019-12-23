@@ -187,7 +187,7 @@ def create_img_bin_string():
     img = Image.fromarray(a.astype('uint8')).convert('RGB')
     img.save(buffered, format="JPEG")
     img_str = base64.b64encode(buffered.getvalue())
-    return img_str
+    return str(img_str)[2:-1]
 
 def bin_to_img(bin_str):
     img = Image.frombytes(data=bin_str)
@@ -209,3 +209,5 @@ def get_last_month_timestamp():
     today = datetime.datetime.now()
     last_month = today - datetime.timedelta(days=30)
     return str(last_month)[:-3]
+
+print(create_img_bin_string())
