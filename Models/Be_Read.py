@@ -4,7 +4,7 @@ class Be_read:
                  comment_uid_list= None, agree_num= None,
                  agree_uid_list= None, share_num= None,
                  share_uid_list= None, input_string = None,
-                 read_num = None):
+                 read_num = None, category=None):
         if input_string == None:
             self.brid = brid
             self.aid = aid
@@ -17,21 +17,23 @@ class Be_read:
             self.agree_uid_list = agree_uid_list
             self.share_num = share_num
             self.share_uid_list = share_uid_list
+            self.category = category
         else:
             input_string = input_string.replace("(", "")
             input_string = input_string.replace(")", "")
             input_string = input_string.split(', ')
             self.brid = input_string[0].replace("'", "")
-            self.timestamp = input_string[1].replace("'", "")
-            self.read_num = input_string[2].replace("'", "")
-            self.read_uid_list = input_string[3].replace("'", "")
-            self.comment_num = input_string[4].replace("'", "")
-            self.comment_uid_list = input_string[5].replace("'", "")
-            self.agree_num = input_string[6].replace("'", "")
-            self.agree_uid_list = input_string[7].replace("'", "")
-            self.share_num = input_string[8].replace("'", "")
-            self.share_uid_list = input_string[9].replace("'", "")
-            self.aid = input_string[10].replace("'", "")
+            self.aid = input_string[1].replace("'", "")
+            self.timestamp = input_string[2].replace("'", "")
+            self.read_num = input_string[3].replace("'", "")
+            self.read_uid_list = input_string[4].replace("'", "")
+            self.comment_num = input_string[5].replace("'", "")
+            self.comment_uid_list = input_string[6].replace("'", "")
+            self.agree_num = input_string[7].replace("'", "")
+            self.agree_uid_list = input_string[8].replace("'", "")
+            self.share_num = input_string[9].replace("'", "")
+            self.share_uid_list = input_string[10].replace("'", "")
+            self.category = input_string[11].replace("'", "")
 
     def __str__(self):
-        return "( \""  +self.brid +"\",\"" + self.timestamp +"\"," + str(self.read_num) + ",\"" + self.read_uid_list + "\"," + str(self.comment_num) + ",\"" + self.comment_uid_list +"\","+ str(self.agree_num) + ",\"" + self.agree_uid_list + "\"," + str(self.share_num) + ",\"" + self.share_uid_list +  "\")"
+        return "( \""  +self.brid +"\",\"" +self.aid + "\",\"" + self.timestamp +"\"," + str(self.read_num) + ",\"" + self.read_uid_list + "\"," + str(self.comment_num) + ",\"" + self.comment_uid_list +"\","+ str(self.agree_num) + ",\"" + self.agree_uid_list + "\"," + str(self.share_num) + ",\"" + self.share_uid_list +  "\")"

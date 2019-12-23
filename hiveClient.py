@@ -196,11 +196,11 @@ class HiveClient:
         for a in articles:
             query += ' ("' + a.aid + '","' + a.timestamp+ '","' + a.title+ '","' + a.abstract+ '","' + a.article_tags+ '","' + a.author+ '","' + a.language+ '", "' + a.text+ '", "' + a.image+ '", "' + str(a.video) +'")'
             if (i != len(articles)):
-                # query += '  union all '
                 query += ', '
             i += 1
         # print(query, len(users), i)
         cur.execute(query)
+        self.create_be_reads(articles, category)
 
     # Input: Read object
     def create_read(self, read):
@@ -215,6 +215,20 @@ class HiveClient:
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
         cur.execute('insert into table be_read partition(aid="'+ be_read.aid +'") values' + be_read.__str__())
+
+    # Input: Be_read object
+    def create_be_reads(self, articles, category):
+        cur = self.conn.cursor()
+        cur.execute('set hive.support.concurrency=true')
+        cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
+        query = 'insert into table be_read partition(category="'+ category +'") values'
+        i = 1
+        for a in articles:
+            query += ' ("' + utils.create_id("br") + '","' + a.aid + '","' + str(utils.get_current_timestamp()) + '",' + str(0) + ',"",' + str(0) + ',"",' + str(0) + ', "", ' + str(0) + ', "")'
+            if (i != len(articles)):
+                query += ', '
+            i += 1
+        cur.execute(query)
 
     # Input: Popular_rank object
     def create_popular_rank(self, pop_rank):
@@ -560,36 +574,5 @@ class HiveClient:
             article_list.append(a)
         return article_list
 
-
-def __pretty_print(input):
-    for element in input:
-        print(element)
-
-
 #print("setting up connection " , config.host_name, config.port)
 client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
-# print(client.get_user_by_uid(uid="u679cda57-1e53-41d3-ac29-2d601af6e344", region="Beijing"))
-r = Read(rid=utils.create_id("r"), aid="a875087a5-1231-4d0e-bebf-a2314586046d", uid="u679cda57-1e53-41d3-ac29-2d601af6e344", timestamp=utils.get_current_timestamp(), read_or_not=True, read_time_length=0, read_sequence=0, agree_or_not=False, comment_or_not=False, share_or_not=False, comment_detail="")
-
-
-articles = []
-for i in range(50):
-    articles.append(utils.gen_an_article(i))
-
-#client.create_articles(articles, "Technology")
-# i = 0
-# for element in client.get_all_articles(category="Science"):
-#     if(i <7):
-#         br = Be_read(brid=utils.create_id("br"), aid=element.aid,
-#                      timestamp=utils.get_current_timestamp(), read_uid_list="", comment_num=0, comment_uid_list="",
-#                      agree_num=0, agree_uid_list="", share_num=0, share_uid_list="", read_num=random.randint(0,1000))
-#         client.create_be_read(be_read=br)
-#         r = Read(rid=utils.create_id("r"), aid=element.aid,
-#                  uid="u679cda57-1e53-41d3-ac29-2d601af6e344", timestamp=utils.get_current_timestamp(), read_or_not=True,
-#                  read_time_length=0, read_sequence=0, agree_or_not=False, comment_or_not=False, share_or_not=False,
-#                  comment_detail="")
-#         client.create_read(r)
-#         i +=1
-#
-#         print(i, element.aid)
-#client.create_be_read(be_read=br)
