@@ -72,7 +72,7 @@ class HiveClient:
             read = Read(
                 rid=read[0],
                 aid=read[1],
-                timestamp=read[2],
+                timestamp=str(read[2]),
                 read_or_not=read[3],
                 read_time_length=read[4],
                 read_sequence=read[5],
@@ -118,6 +118,7 @@ class HiveClient:
             query += ' limit ' + str(page_size) + ' offset ' + str(page_number*page_size)
         cur.execute(query)
         result = cur.fetchall()
+        print("got from hive:" ,result)
         article_list = []
         for article in result:
             article_list.append(Article(

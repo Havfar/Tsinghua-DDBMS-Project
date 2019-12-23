@@ -22,6 +22,7 @@ export default class User extends React.Component {
         collapseTarget: undefined,
         id: undefined,
         readsFetched: false,
+        readRows: undefined,
         }
     }   
 
@@ -52,10 +53,40 @@ export default class User extends React.Component {
         this.setState({showReads : !this.state.showReads})
     }
 
-    fetchReads = () =>{
+    componentDidUpdate(){
+
+    }
+
+    fetchReads = async() =>{
         console.log("fetching")
 
-        this.setState({showReads : true})
+        let url = "http://localhost:5000/user_read_table/?uid="+this.state.uid
+        let data = await fetch(url, {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+              'Content-Type': 'application/json'
+            }
+        }).then(response => response.json()).catch(err => {
+            console.log(err)
+        })
+        
+        this.setState({
+            readRows: data.map((readObject, i) => (
+                <tr>
+                    <th scope="col">{readObject.aid}</th>
+                    <th scope="col">{readObject.timestamp}</th>
+                    <th scope="col">{this.getYayOrNay(readObject.agree_or_not)}</th>
+                    <th scope="col">{this.getYayOrNay(readObject.share_or_not)}</th>
+                    <th scope="col">{this.getYayOrNay(readObject.comment_or_not)}</th>
+                    <th scope="col">{readObject.comment}</th>
+                </tr>
+              )),
+              showReads: true,
+              fetchReads: true
+        })
     }
 
     getYayOrNay(value){
@@ -132,6 +163,7 @@ export default class User extends React.Component {
                         <th scope="col">Comment</th>
                     </tr>
                 </thead>
+                {this.state.readRows}
                 {/* <tr>
                     <th scope="row">u679cda57-1e53-41d3-ac29-2d601af6e344</th>
                     <td>2019-24-12 09:23:34</td>

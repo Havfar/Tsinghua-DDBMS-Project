@@ -83,7 +83,7 @@ export default class PopularRank extends React.Component {
             this.setState({
                 shouldLoadArticles: false,
                 topArticles: article_list.map((jsonArticle, i) => (
-                    <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={i} id={i}/>
+                    <Article genRead={this.props.genRead} aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={i} id={i}/>
                   ))
             })
         }catch (err) {
@@ -112,7 +112,7 @@ export default class PopularRank extends React.Component {
             this.setState({
                 TypeSearch: undefined,
               articles: this.state.article_id_list.map((jsonArticle, i) => (
-                <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={i} id={i}/>
+                <Article genRead={this.props.genRead} aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={true} collapseTarget={i} id={i}/>
               )
     )})
 }

@@ -35,8 +35,6 @@ export default class Article extends React.Component {
             })
     }
 
-    com
-
     getCompressedView(){
         return( 
             <div className="card text-left mt-4" onClick={this.toggleCompress}>
@@ -64,12 +62,13 @@ export default class Article extends React.Component {
 
 
     getFullView(){
+        this.props.genRead(this.state.aid)
         return(
             <div className="card text-left " onClick={this.toggleCompress}>
                 <span className="col-1"/>
                 <div className="col">
                     <div className="row mt-3">
-                        <img className="col" src="https://tse3-mm.cn.bing.net/th/id/OIP.BFzdEk9ZBP23QuzfF9RYJgHaFj?w=231&h=171&c=7&o=5&dpr=2&pid=1.7"></img>
+                        <img className="col" src={"data:image/jpg;base64," + this.state.image}></img>
                     </div>
                     <div className="row">
                         <h2 className="col ml-1 mt-2">{this.state.title}</h2>
@@ -78,7 +77,6 @@ export default class Article extends React.Component {
                     </div>
                     <div className="row">
                         <p className="col ml-1 font-weight-light">by {this.state.author}</p>
-                    
                     </div>
                     <div className="row">
                         <p className="col">{this.state.abstract}</p>

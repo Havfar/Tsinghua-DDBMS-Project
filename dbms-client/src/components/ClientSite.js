@@ -20,7 +20,7 @@ export default class ClientSite extends React.Component {
             toDoList: ["per", "paal", "askeladden"],
             currentPageNumber : 1,
             activeComponent:'clientSite',
-            loggedInUser: undefined,
+            loggedInUser: "u2d83ecac-c8e3-4340-89fc-745ccc455814",
             fetchedData: undefined,
             url: undefined,
             loadingFinished: undefined,
@@ -89,7 +89,7 @@ export default class ClientSite extends React.Component {
             this.setState({
                 TypeSearch: undefined,
               users: data.map((jsonUser, i) => (
-                <User uid={jsonUser.uid} timestamp={jsonUser.timestamp} name={jsonUser.name} gender={jsonUser.gender} email={jsonUser.email} phone={jsonUser.phone} dept={jsonUser.dept} language={jsonUser.language} region={jsonUser.region} role={jsonUser.region} role={jsonUser.role} prefer_tags={jsonUser.prefer_tags} obtained_credits={jsonUser.obtained_credits} age={data.age} compressed={true} collapseTarget={i} id={i}/>
+                <User fetchReads={this.fetchUserReads} uid={jsonUser.uid} timestamp={jsonUser.timestamp} name={jsonUser.name} gender={jsonUser.gender} email={jsonUser.email} phone={jsonUser.phone} dept={jsonUser.dept} language={jsonUser.language} region={jsonUser.region} role={jsonUser.region} role={jsonUser.role} prefer_tags={jsonUser.prefer_tags} obtained_credits={jsonUser.obtained_credits} age={data.age} compressed={true} collapseTarget={i} id={i}/>
               ))
 
         })
@@ -114,7 +114,7 @@ genArticles = async() => {
             this.setState({
                 TypeSearch: undefined,
               articles: data.map((jsonArticle, i) => (
-                <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={i} id={i}/>
+                <Article genRead={this.callBackGenRead} aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={true} collapseTarget={i} id={i}/>
               ))
         })
     }catch (err) {
@@ -138,7 +138,7 @@ genUser = async(url) => {
         this.setState({
             TypeSearch: undefined,
           singleUser: 
-          <User uid={jsonUser.uid} timestamp={jsonUser.timestamp} name={jsonUser.name} gender={jsonUser.gender} email={jsonUser.email} phone={jsonUser.phone} dept={jsonUser.dept} language={jsonUser.language} region={jsonUser.region} role={jsonUser.region} role={jsonUser.role} prefer_tags={jsonUser.prefer_tags} obtained_credits={jsonUser.obtained_credits} age={jsonUser.age} compressed={false} collapseTarget={1} id={1}/>
+          <User fetchReads={this.fetchUserReads} uid={jsonUser.uid} timestamp={jsonUser.timestamp} name={jsonUser.name} gender={jsonUser.gender} email={jsonUser.email} phone={jsonUser.phone} dept={jsonUser.dept} language={jsonUser.language} region={jsonUser.region} role={jsonUser.region} role={jsonUser.role} prefer_tags={jsonUser.prefer_tags} obtained_credits={jsonUser.obtained_credits} age={jsonUser.age} compressed={false} collapseTarget={1} id={1}/>
         })
 }catch (err) {
     console.log(err);
@@ -162,7 +162,7 @@ genArticle = async(url) => {
         this.setState({
             TypeSearch: undefined,
           singleArticle: 
-          <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={1} id={1}/>
+          <Article genRead={this.callBackGenRead} aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={1} id={1}/>
 
         })
 }catch (err) {
@@ -346,7 +346,7 @@ toggleSearchBar = () =>{
 
     getPopularRank(){
         return(
-            <PopularRank/>
+            <PopularRank genRead={this.callBackGenRead}/>
         )
     }
 
@@ -361,6 +361,21 @@ toggleSearchBar = () =>{
 
     changeActiveComponent(component){
         this.setState({activeComponent:component})
+    }
+
+    callBackGenRead = (aid) => {
+        let url = "http://localhost:5000/create_read/?aid=" + aid + "&uid=" + this.state.loggedInUser
+
+        fetch(url, {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+              'Content-Type': 'application/json'
+            }
+        }).then(response => {console.log(response)}).catch(err => {console.log(err)})
+
     }
 
     render () {

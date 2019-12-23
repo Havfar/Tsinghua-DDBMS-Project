@@ -29,6 +29,31 @@ def postjson():
     print("content.name:", content["name"])
     return content
 
+# create a read for when a user reads an article
+@app.route('/create_read/', methods=['GET'])
+def create_read():
+    # get uid and aid
+    uid = request.args.get('uid')
+    aid = request.args.get('aid')
+
+    # create read id
+    rid = utils.create_id('r')
+
+    # create timestamp
+    timestamp = utils.get_current_timestamp()
+
+    # Create hiveclient
+    client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+    
+    # Create readobject
+    new_read = Read(rid=rid, aid=aid, uid=uid, timestamp=timestamp, read_time_length=0, read_sequence=0, read_or_not=True, agree_or_not=True, comment_or_not=False, share_or_not=False, comment_detail="", input_string=None)
+    
+    # Send read to hive
+    client.create_read(new_read)
+
+    return rid
+
+
 # Creates a user
 @app.route('/create_user', methods = ['POST'])
 def create_user():
@@ -73,7 +98,6 @@ def create_article():
 
     return "Article created with aid: " + aid
 
-
 # Loads article without uid - does not create new read entry
 @app.route('/load_article_from_popular/', methods = ['GET'])
 def load_pop_article():
@@ -86,7 +110,6 @@ def load_pop_article():
     requested_article = client.get_article_by_aid(aid = aid, category=None)
 
     return requested_article.__dict__
-
 
 # returns article by aid on json format {}, also updates be_read table and requesting user read_table
 @app.route('/load_article/', methods = ['GET'])
@@ -159,6 +182,7 @@ def load_all_articles():
 
     # Get articles from hive []
     all_articles = client.get_articles_by_category(category_science)
+    print("received articles")
     list_all_articles = []
 
     # Convert users to dicts and append to list
@@ -193,29 +217,27 @@ def be_read():
     
     # be_read_table holds a "read_uid_list" string. Needs to be split somehow to get all unique user ids
     be_read_table = client.get_be_read_by_aid(aid = aid, page_size=None, page_number=None)
-    
 
-    list_of_dicts = []
-    for be_read_obj in be_read_table:
-        list_of_dicts.append(be_read_obj.__dict__)
+    return be_read_table.__dict__
 
-    return json.dumps(list_of_dicts)
+# creates a be_read for an article
 
 # Returns all articles read by the uid, returned as json [{}]
-@app.route('/user_read_table', methods = ['GET'])
+@app.route('/user_read_table/', methods = ['GET'])
 def user_read_table():
-    content = request.json
-    print("Content:", content)
-
+    
+    # get uid
+    uid = request.args.get('uid')
+    
     # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
-    # Get read articles from hive - returned as list
-    requested_read_articles = client.get_user_read_table_by_uid(uid=content["uid"], page_size=None, page_number=None)
+    # Get list of read objects
+    read_objects_list = client.get_read_by_uid(uid, page_size=None, page_number=None)
 
     # Convert list of Read objects to list of dicts
     list_of_dicts = []
-    for readobj in requested_read_articles:
+    for readobj in read_objects_list:
         list_of_dicts.append(readobj.__dict__)
     
     # Returns a json to the app, but it is enclosed in '[]' square brackets.

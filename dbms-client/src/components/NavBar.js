@@ -6,7 +6,7 @@ export default class NavBar extends React.Component {
     super(props)
     
     this.state = { 
-            loggedInUid: undefined,
+            loggedInUid: "u2d83ecac-c8e3-4340-89fc-745ccc455814",
             parent:props.parent,
             active:'clientSite'
 
@@ -41,7 +41,7 @@ render(){
                         <div className="collapse navbar-collapse" id="navbarResponsive">
                             <ul className="navbar-nav ml-auto">
                                 <li>
-                                <span className="row col"><input className="form-control sm col-8" type="text" placeholder="Logged in userID" aria-label="Search" value={this.state.search} onChange={e => this.setState({loggedInUid: e.target.value})}/>
+                                <span className="row col"><input className="form-control sm col-8" type="text" placeholder="Logged in userID" aria-label="Search" value={this.state.loggedInUid} onChange={e => this.setState({loggedInUid: e.target.value})}/>
                                 <button type="button" className="btn btn-primary btn-md col-4" data-toggle="button" aria-pressed="false" onClick={() =>this.logInUser()}> Log In </button>
                                 </span>
                                 </li>
