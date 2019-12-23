@@ -19,20 +19,20 @@ export default class Article extends React.Component {
             }
         }   
     componentDidMount(){
-       this.setState({
-            aid: this.props.aid,
-            timestamp: this.propsdata.timestamp,
-            title: this.propsdata.title,
-            abstract: this.propsdata.abstract,
-            article_tags: this.propsdata.article_tags,
-            author: this.propsdata.author,
-            language: this.propsdata.language,
-            text: this.propsdata.text,
-            image: this.propsdata.image,
-            video: this.propsdata.video,
-            category: this.propsdata.category,
-            compressed: this.props.compressed
-        })
+        this.setState({
+                aid: this.props.aid,
+                timestamp: this.props.timestamp,
+                title: this.props.title,
+                abstract: this.props.abstract,
+                article_tags: this.props.article_tags,
+                author: this.props.author,
+                language: this.props.language,
+                text: this.props.text,
+                image: this.props.image,
+                video: this.props.video,
+                category: this.props.category,
+                compressed: this.props.compressed
+            })
     }
 
     getCompressedView(){

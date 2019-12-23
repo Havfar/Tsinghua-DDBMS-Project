@@ -11,64 +11,14 @@ from Models.Article import Article
 from Models.Be_Read import Be_read
 from Models.Read import Read
 import random
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def hello_world():
-   return 'Hello World from dbms1'
-   
-"""
-@app.route('/article/<number>')
-def article_number(number):
-   return 'GET article number: %s' % number
-
-@app.route('/beijing')
-def beijing():
-    return render_template('beijing.html')
-
-@app.route('/hongkong')
-def hongkong():
-    return render_template('hongkong.html')
-
-@app.route('/userinput/')
-def userinput():
-    if((request.args.get('name') == None) or (request.args.get('lname') == None)):
-        return("Please submit a name lastname like '/userinput/?name=\"name\"&lname=\"lname\"', but don't use \'\"\'")
-    else:
-        name = request.args.get('name')
-        secondName = request.args.get('lname')
-        returnGibberish = name + secondName
-        returnGibberish = ''.join(random.sample(returnGibberish,len(returnGibberish)))
-        # random.shuffle((returnGibberish))
-        return returnGibberish
-"""
-
-# @app.route('/formpost', methods = ['POST'])
-# def formpost():
-#     if request.method == 'POST':
-        
-#         newFormListener = formListener()
-#         readFormResponse = newFormListener.readForm(request.form)
-#         return readFormResponse
-
-"""
-@app.route('/testpost',methods = ['POST', 'GET'])
-def login():
-   if request.method == 'POST':
-       #user = request.form['nm']
-       # #return redirect(url_for('success',name = user))
-        if(request.args.get('lname') != None):
-            return "Received post from " + request.args.get('lname')
-        else:
-            return "Received your post."
-   else:
-        #user = request.args.get('nm')
-        #return redirect(url_for('success',name = user))
-        if(request.args.get('name') != None):
-            return "Sending " + request.args.get('name') + "'s post"
-        else:
-            return "Sending your post."
-"""
+   return 'Hello World from dbms2'
+ 
 
 # just for testing json
 @app.route('/postjson', methods = ['POST'])
@@ -89,15 +39,17 @@ def create_user():
     # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
+    uid = utils.create_id("u")
+
     # Create User object
-    new_user = User(uid=utils.create_id("u"), timestamp=utils.get_current_timestamp(), name=content["name"], gender=content["gender"], email=content["email"], age=content["age"], phone=content["phone"], dept=content["department"], region=content["region"], language=content["language"], role=content["role"], prefer_tags=content["prefer_tags"], obtained_credits=content["obtained_credits"], input_string=None)
+    new_user = User(uid=uid, timestamp=utils.get_current_timestamp(), name=content["name"], gender=content["gender"], email=content["email"], age=content["age"], phone=content["phone"], dept=content["department"], region=content["region"], language=content["language"], role=content["role"], prefer_tags=content["prefer_tags"], obtained_credits=content["obtained_credits"], input_string=None)
 
     print("User created:", new_user)
 
     # Create user in hive
     client.create_user(new_user)
 
-    return "User created"
+    return "User created with id: " + uid
 
 # Creates an article
 @app.route('/create_article', methods = ['POST'])
@@ -109,36 +61,53 @@ def create_article():
     # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
+    aid = utils.create_id("a")
+
     # Create Article object
-    new_article = Article(aid=utils.create_id("a"), timestamp=utils.get_current_timestamp(), title=content["title"], category=content["category"], abstract=content["abstract"], article_tags=content["article_tags"], author=content["author"], language=content["language"], text=content["text"], image=content["image"], video=content["video"], input_string=None)
+    new_article = Article(aid=aid, timestamp=utils.get_current_timestamp(), title=content["title"], category=content["category"], abstract=content["abstract"], article_tags=content["article_tags"], author=content["author"], language=content["language"], text=content["text"], image=content["image"], video=content["video"], input_string=None)
 
     print("Article created:", new_article)
     
     # Create article in hive
     client.create_article(new_article)
 
-    return "Article created"
+    return "Article created with aid: " + aid
 
+# Loads article without uid - does not create new read entry
+@app.route('/load_article_from_popular/', methods = ['GET'])
+def load_pop_article():
+    aid = request.args.get('aid')
+
+     # Create hiveclient
+    client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+
+    # Get article from hive
+    requested_article = client.get_article_by_aid(aid = aid, category=None)
+
+    return requested_article.__dict__
 
 # returns article by aid on json format {}, also updates be_read table and requesting user read_table
-@app.route('/load_article', methods = ['GET'])
+@app.route('/load_article/', methods = ['GET'])
 def load_article():
+    uid = request.args.get('uid')
+    aid = request.args.get('aid')
+    print("uid:", uid, "aid:", aid)
 
-    content = request.json
-    print("Content:", content)
-    uid = content["uid"]
-    aid = content["aid"]
+    #content = request.json
+    #print("Content:", content)
+    #uid = content["uid"]
+    #aid = content["aid"]
     current_time = utils.get_current_timestamp()
 
     # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
     # Get article from hive
-    requested_article = client.get_article_by_aid(aid = content["aid"], category=None)
+    requested_article = client.get_article_by_aid(aid = aid, category=None)
 
 
     # Create Read object of the loaded article aid and uid
-    new_read = Read(id=None, aid=aid, uid=uid, timestamp=current_time, read_or_not=True, read_time_length=0, read_sequence=1, agree_or_not=True, comment_or_not=None, share_or_not=None, comment_detail=None, input_string=None)
+    new_read = Read(rid=utils.create_id('r'), aid=aid, uid=uid, timestamp=current_time, read_or_not=True, read_time_length=0, read_sequence=1, agree_or_not=True, comment_or_not=False, share_or_not=False, comment_detail="")
 
     # insert new_read into hive
     client.create_read(new_read)
@@ -157,33 +126,86 @@ def load_article():
     return requested_article.__dict__
 
 
+# returns list of all users [{}]
+@app.route('/load_all_users', methods = ['GET'])
+def load_all_users():
+    # region is hardcoded for this server as it is dbms1
+    region = 'HongKong'
+
+    # Create hiveclient
+    client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+
+    # Get users from hive []
+    all_users = client.get_users_by_region(region=region)
+    list_all_users = []
+
+    # Convert users to dicts and append to list
+    for user in all_users:
+        list_all_users.append(user.__dict__)
+    return json.dumps(list_all_users)
+
+# returns list of all users [{}]
+@app.route('/load_all_articles', methods = ['GET'])
+def load_all_articles():
+    # category is hardcoded for this server as it is dbms2
+    # gets articles from both categories
+
+    category_science = 'Science'
+    category_technology = 'Technology'
+    # Create hiveclient
+    client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+
+    # Get articles from hive []
+    all_articles_science = client.get_articles_by_category(category_science)
+    all_articles_technology = client.get_articles_by_category(category_technology)
+    list_all_articles = []
+
+    # Convert articles to dicts and append to list
+    for article in all_articles_science:
+        list_all_articles.append(article.__dict__)
+
+    # Convert articles to dicts and append to list
+    for article in all_articles_technology:
+        list_all_articles.append(article.__dict__)
+
+    return json.dumps(list_all_articles)
+
+
 # returns user object for given uid, returns json {}
-@app.route('/load_user', methods = ['GET'])
+@app.route('/load_user/', methods = ['GET'])
 def load_user():
-    content = request.json
-    print("Content:", content)
+    uid = request.args.get('uid')
+
+    # Hardcoded region for dbms2
+    region = "HongKong"
+    print("uid:", uid)
+    #content = request.json
+    #print("Content:", content)
 
     # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
     # Get user from hive
-    requested_user = client.get_user_by_uid(uid = content["uid"], region=None)
-
+    requested_user = client.get_user_by_uid(uid = uid, region=region)
+    print("user from client:", requested_user.__dict__)
     return requested_user.__dict__
 
 # returns be_read object holding all uid's that has read the article with given aid - json format {}
-@app.route('/be_read_by_aid', methods = ['GET'])
+@app.route('/be_read_by_aid/', methods = ['GET'])
 def be_read():
-    content = request.json
-    print("Content:", content)
+    aid = request.args.get('aid')
 
-    # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+    
+    # be_read_table holds a "read_uid_list" string. Needs to be split somehow to get all unique user ids
+    be_read_table = client.get_be_read_by_aid(aid = aid, page_size=None, page_number=None)
+    
 
-    # Get Be_Read from hive
-    requested_Be_Read = client.get_be_read_by_aid(aid = content["aid"], page_size=None, page_number=None)
+    list_of_dicts = []
+    for be_read_obj in be_read_table:
+        list_of_dicts.append(be_read_obj.__dict__)
 
-    return requested_Be_Read.__dict__
+    return json.dumps(list_of_dicts)
 
 # Returns all articles read by the uid, returned as json [{}]
 @app.route('/user_read_table', methods = ['GET'])
@@ -207,7 +229,32 @@ def user_read_table():
     return json.dumps(list_of_dicts)
 
 
+# Returns most popular articles by day/week/month
+@app.route('/popular_rank/', methods = ['GET'])
+def popular_rank():
 
+    # This does not support categories as of time being, but can
+    # be implemented. Needs changes to the hiveclient calls.
+    
+    # filter is the same as granulairty (eg. daily/weekly/monthly)
+    # Should be either "weekly", "monthly" or anything.
+    filter = request.args.get("filter")
+
+    # Create hiveclient
+    client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
+
+    # I think this is a list of article_ids
+    article_id_list = client.get_popularity_rank(filter)
+
+    # Need to fetch all articles objects for these id's
+    list_of_article_objects = []
+
+    for article_id in article_id_list:
+        article = client.get_article_by_aid(article_id, category=None)
+        list_of_article_objects.append(article)
+
+    # return dump of the list (json) [{}]
+    return json.dumps(list_of_article_objects)
 
 
 if __name__ == '__main__':
@@ -216,4 +263,4 @@ if __name__ == '__main__':
     #print(querybuilder.selectUserFromTable(None, "userID", ">", 23, None, None, None))
     # if no port is provided it defaults to 5000
 
-    app.run(port=5000)
+    app.run(port=5001)

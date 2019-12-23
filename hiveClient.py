@@ -138,7 +138,7 @@ class HiveClient:
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-        cur.execute('insert into table read partition("' + read.uid +'") values' + read.__str__())
+        cur.execute('insert into table read partition(uid="' + read.uid +'") values' + read.__str__())
 
     # Input: Be_read object
     def create_be_read(self, be_read):
@@ -206,16 +206,16 @@ class HiveClient:
         cur.execute(query)
         result = cur.fetchall()[0]
         article = Article(
-            aid=result[2],
-            timestamp=result[3],
-            title=result[4],
-            abstract=result[5],
-            article_tags=result[6],
-            author=result[7],
-            language=result[8],
-            text=result[9],
-            image=result[10],
-            video=result[11],
+            aid=result[0],
+            timestamp=result[1],
+            title=result[2],
+            abstract=result[3],
+            article_tags=result[4],
+            author=result[5],
+            language=result[6],
+            text=result[7],
+            image=result[8],
+            video=result[9],
         )
         return article
 

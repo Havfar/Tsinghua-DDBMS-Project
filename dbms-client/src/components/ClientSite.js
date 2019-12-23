@@ -145,6 +145,7 @@ genUser = async(url) => {
   }
 }
 
+
 genArticle = async(url) => {
     try {
         let jsonArticle = await fetch(this.state.url, {
@@ -174,29 +175,18 @@ toggleSearchBar = () =>{
         this.setState({hideSearchBar : !this.state.hideSearchBar})
 }
 
-queryFlaskServer = (url) => {
-        fetch(url, {
-            method: 'GET', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, *cors, same-origin
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: 'same-origin', // include, *same-origin, omit
-            headers: {
-              'Content-Type': 'application/json'
-            }
-        })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data)
-        return(data)
-    });
-
-    }
-
     callBackSearch = async (TypeSearch, searchString, region, category) => {
         let url = ""
+        let port = ""
         switch(TypeSearch){
             case "article":
-                url = 'http://localhost:5000/load_article/?aid=' + searchString + "&uid="+this.state.loggedInUser
+                if(category == 'Technology'){
+                        port = '5000'
+                }
+                else{
+                    port = '5001'
+                }
+                url = 'http://localhost:' + port + '/load_article/?aid=' + searchString + "&uid="+this.state.loggedInUser
                 this.setState({
                     SAid: searchString,
                     TypeSearch: TypeSearch,
@@ -207,7 +197,13 @@ queryFlaskServer = (url) => {
                 )
                 break;
             case "user":
-                url = 'http://localhost:5000/load_user/?uid=' + searchString
+                if(region == "Beijing"){
+                    port = '5000'
+                }
+                else{
+                    port = '5001'
+                }
+                url = 'http://localhost:'+port+'/load_user/?uid=' + searchString
                 this.setState({
                     SUid: searchString,
                     TypeSearch: TypeSearch,
@@ -218,7 +214,13 @@ queryFlaskServer = (url) => {
                 })
                 break;
             case "allArticles":
-                url = 'http://localhost:5000/load_all_articles'
+                if(category == 'Technology'){
+                    port = '5000'
+            }
+            else{
+                port = '5001'
+            }
+                url = 'http://localhost:'+port+'/load_all_articles'
                 this.setState({
                     TypeSearch: TypeSearch,
                     category: category,
@@ -229,7 +231,14 @@ queryFlaskServer = (url) => {
                 });
                 break;
             case "allUsers":
-                url = 'TODO'
+                if(region == "Beijing"){
+                    port = '5000'
+                }
+                else{
+                    port = '5001'
+                }
+                url = 'http://localhost:'+port+'/load_all_users'
+
                 this.setState({
                     TypeSearch: TypeSearch,
                     region: region,
@@ -303,28 +312,28 @@ queryFlaskServer = (url) => {
 
         switch(this.state.TypeSearch){
             case "user":
-                return <div className="col">
+                return <div>
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.singleUser}
                 </div>
             case "article":
-                return <div className="col">
+                return <div>
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.singleArticle}
                 </div>
             case "allUsers":
-                return <div className="col">
+                return <div>
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.users}
                 </div>
             case "allArticles":
-                return <div className="col">
+                return <div>
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.articles}
                 </div>
                 // no TypeSearch eg initial load of site
             default:
-                return <div className="col">
+                return <div>
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                         {this.state.singleUser}
                         {this.state.singleArticle}
@@ -359,6 +368,7 @@ queryFlaskServer = (url) => {
                     <NavBar callBackLoggedInUser={this.callBackLoggedInUser} parent={this}/>
                     <div class="container mt-5">
                             <div class="row">
+                                <div class="col-lg-12 text-center"></div>
                                     {this.getAcitveComponent()}
                                     {/* {this.genClientSite(this.state.TypeSearch)} */}
                                     {/* {this.getPopularRank()} */}

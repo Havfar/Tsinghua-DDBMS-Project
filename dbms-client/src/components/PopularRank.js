@@ -13,6 +13,10 @@ export default class PopularRank extends React.Component {
             aidList: [],
             category: "",
             topArticles: [1,2,3,4,5],
+            url: undefined,
+            article_id_list: undefined,
+            must_load_articles_from_list: undefined,
+            shouldLoadArticles: undefined
             }
         }   
     componentDidMount(){
@@ -20,24 +24,102 @@ export default class PopularRank extends React.Component {
     }
 
     changeTemporalGranularity(value){
-        this.loadArticles()
-        this.setState({temporalGranularity:value})
+        this.setState({
+            shouldLoadArticles: true,
+            temporalGranularity:value
+        })
+    }
+
+    componentDidUpdate(){
+        if(this.state.must_load_articles_from_list){
+            this.getArticlesFromList()
+        }
+
+        if(this.state.shouldLoadArticles){
+            this.loadArticles()
+        }
+
+    }
+
+    getArticlesFromList = async() => {
+        let list_of_articles = []
+        for (const article_id of this.state.article_id_list){
+            try{
+            let url = "http://localhost:5000/load_article_from_popular/?aid="+article_id
+            let article_object = await fetch(url, {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+            }).then(response => response.json());
+            list_of_articles.push(article_object)
+            }
+            catch(err){
+                console.log(err)
+            }
+        }
+        this.setState({
+            must_load_articles_from_list: false,
+        topArticles: list_of_articles.map((jsonArticle, i) => (
+            <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={i} id={i}/>
+          ))
+        })
+    }
+
+
+    getPopularArticlesList = async() => {
+        try {
+            let url = "http://localhost:5000/popular_rank/" + this.state.temporalGranularity
+            let article_id_list = await fetch(url, {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+            }).then(response => response.json())
+    
+            // this will re render the view with new data
+            this.setState({
+                shouldLoadArticles: false,
+                must_load_articles_from_list: true,
+              article_id_list: article_id_list 
+              //<Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={1} id={1}/>
+            })
+        }catch (err) {
+            console.log(err);
+        }
     }
 
     loadArticles(){
-
+        this.getPopularArticlesList()
     }
 
     getArticles(){
         return(
             <div className="row mt-5 ">
                 <span className="row text-center "><h1 className="col">Most popular article</h1></span>
-                {this.state.topArticles.map(function(item) {
-                    return <Article/>
-                })}
+                {this.state.topArticles}
             </div>
         )
     }
+
+
+    genPopularArticles = (article_id_list) => {
+
+
+            // this will re render the view with new data
+            this.setState({
+                TypeSearch: undefined,
+              articles: this.state.article_id_list.map((jsonArticle, i) => (
+                <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={i} id={i}/>
+              )
+    )})
+}
 
     getActiveButton(value){
         if(this.state.temporalGranularity === value){
