@@ -7,7 +7,8 @@ from PIL import Image
 from shutil import copyfile
 import os
 import loremipsum
-
+import names
+from coolname import generate_slug
 from Models.Article import Article
 from Models.Read import Read
 from Models.User import User
@@ -36,11 +37,11 @@ def gen_an_article (i):
     article = {}
     timestamp = get_current_timestamp()
     aid = create_id('a')
-    title = "title%d" % i
-    category = "science" if random() > 0.55 else "technology"
+    title = generate_slug()
+    category = "Science" if random() > 0.55 else "Technology"
     abstract = "abstract of article %d" % i
     article_tags = "tags%d" % int(random() * 50)
-    author  = "author%d" % int(random() * 2000)
+    author  = names.get_full_name()
     language = "en" if random() > 0.5 else "zh"
     # create text
     article["text"] = "text_a"+str(i)+'.txt'
@@ -69,9 +70,9 @@ def gen_an_article (i):
         #has one video
         video = "video_a"+str(i)+'_video.flv'
         if random()<0.5:
-            copyfile('./video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
+            copyfile('./3-sized-db-generation/video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
         else:
-            copyfile('./video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
+            copyfile('./3-sized-db-generation/video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
     else:
         video = ""
 
@@ -122,8 +123,8 @@ def gen_an_user (i):
     user = {}
     timestamp = get_current_timestamp()
     uid = create_id("u")
-    name = "user%d" % i
     gender = "male" if random() > 0.33 else "female"
+    name = names.get_full_name(gender=gender)
     email = "email%d" % i
     phone = "phone%d" % i
     dept  = "dept%d" % int(random() * 20)
