@@ -49,7 +49,3 @@ class Article:
            "\"" + self.text+ "\", " + \
            "\"" + self.image+ "\", " + \
            "\"" + str(self.video) + "\")"
-
-# a = Article("id", "aid", "timestamp", "title",
-#                  "category", "abstract", "article_tags",
-#                  "authors", "language", "text", "image", "video")

@@ -344,6 +344,12 @@ celerybeat-schedule
 # mkdocs documentation
 /site
 
+/articles
+
+.pyc
+.idea
+
+/3-sized-db-generation
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -367,5 +373,5 @@ thumb
 sketch
 
 #config
-config.py
+
 # End of https://www.gitignore.io/api/node,react,python,images,pycharm
