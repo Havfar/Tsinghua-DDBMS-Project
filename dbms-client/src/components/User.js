@@ -123,30 +123,6 @@ export default class User extends React.Component {
                     <tr>
                         No reads available
                     </tr>
-                    {/* <tr>
-                        <th scope="row">u679cda57-1e53-41d3-ac29-2d601af6e344</th>
-                        <td>2019-24-12 09:23:34</td>
-                        <td>{this.getYayOrNay(true)}</td>
-                        <td>{this.getYayOrNay(false)}</td>
-                        <td>{this.getYayOrNay(false)}</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">u679cda57-1e53-41d3-ac29-2d601af6e344</th>
-                        <td>2019-24-12 09:23:34</td>
-                        <td>{this.getYayOrNay(true)}</td>
-                        <td>{this.getYayOrNay(false)}</td>
-                        <td>{this.getYayOrNay(true)}</td>
-                        <td>"fdjdaskdldøfjsalødkjfsdlaøfjadløskfj fireaofjsklafj"</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">u679cda57-1e53-41d3-ac29-2d601af6e344</th>
-                        <td>2019-24-12 09:23:34</td>
-                        <td>{this.getYayOrNay(true)}</td>
-                        <td>{this.getYayOrNay(false)}</td>
-                        <td>{this.getYayOrNay(true)}</td>
-                        <td> fjewaolsfjroelafjksdlajfepoas</td>
-                    </tr> */}
                 </table>
             )
         }
@@ -164,14 +140,6 @@ export default class User extends React.Component {
                     </tr>
                 </thead>
                 {this.state.readRows}
-                {/* <tr>
-                    <th scope="row">u679cda57-1e53-41d3-ac29-2d601af6e344</th>
-                    <td>2019-24-12 09:23:34</td>
-                    <td>{this.getYayOrNay(true)}</td>
-                    <td>{this.getYayOrNay(false)}</td>
-                    <td>{this.getYayOrNay(false)}</td>
-                    <td></td>
-                </tr>  */}
             </table>
         )
         }

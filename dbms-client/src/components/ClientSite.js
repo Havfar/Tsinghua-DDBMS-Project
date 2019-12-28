@@ -32,8 +32,6 @@ export default class ClientSite extends React.Component {
     }
 
     componentDidMount(){
-        // what is state?
-        // what do we want to generate?
         switch(this.state.TypeSearch){
             case "allUsers":
                 this.genUsers()
@@ -53,8 +51,6 @@ export default class ClientSite extends React.Component {
     }
 
     componentDidUpdate(){
-        // what is state?
-        // what do we want to generate?
         switch(this.state.TypeSearch){
             case "allUsers":
                 this.genUsers()
@@ -225,7 +221,6 @@ toggleSearchBar = () =>{
                     TypeSearch: TypeSearch,
                     category: category,
                     region: region,
-                    category: category,
                     url: url,
                     searchString: searchString
                 });

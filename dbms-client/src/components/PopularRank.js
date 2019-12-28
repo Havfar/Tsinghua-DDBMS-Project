@@ -36,35 +36,6 @@ export default class PopularRank extends React.Component {
         }
 
     }
-/*
-    getArticlesFromList = async() => {
-        let list_of_articles = []
-        for (const article_id of this.state.article_id_list){
-            try{
-            let url = "http://localhost:5000/load_article_from_popular/?aid="+article_id
-            let article_object = await fetch(url, {
-                method: 'GET', // *GET, POST, PUT, DELETE, etc.
-                mode: 'cors', // no-cors, *cors, same-origin
-                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                credentials: 'same-origin', // include, *same-origin, omit
-                headers: {
-                  'Content-Type': 'application/json'
-                }
-            }).then(response => response.json());
-            list_of_articles.push(article_object)
-            }
-            catch(err){
-                console.log(err)
-            }
-        }
-        this.setState({
-            must_load_articles_from_list: false,
-        topArticles: list_of_articles.map((jsonArticle, i) => (
-            <Article aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={false} collapseTarget={i} id={i}/>
-          ))
-        })
-    }
-*/
 
     getPopularArticlesList = async() => {
         try {
