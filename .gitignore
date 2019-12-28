@@ -373,5 +373,5 @@ thumb
 sketch
 
 #config
-
+config.py
 # End of https://www.gitignore.io/api/node,react,python,images,pycharm
