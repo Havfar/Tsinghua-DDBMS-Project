@@ -234,7 +234,7 @@ export default class User extends React.Component {
                 <div class="card w-100">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">
-                            <button class="btn btn-primary btn-sm" style={{width: "100%"}} type="button" data-toggle="collapse" data-target={"#user"+this.props.id} aria-expanded="false" aria-controls="collapseExample">
+                            <button class="btn btn-link btn-sm" style={{width: "100%"}} type="button" data-toggle="collapse" data-target={"#user"+this.props.id} aria-expanded="false" aria-controls="collapseExample">
                                 <h5>Name {this.state.name} {this.props.item}</h5>
                             </button>
                             <div class="collapse" id={"user" + this.props.id}>

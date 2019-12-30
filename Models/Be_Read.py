@@ -8,7 +8,7 @@ class Be_read:
         if input_string == None:
             self.brid = brid
             self.aid = aid
-            self.timestamp = timestamp
+            self.timestamp = str(timestamp)
             self.read_num = read_num
             self.read_uid_list = read_uid_list
             self.comment_num = comment_num
@@ -24,7 +24,7 @@ class Be_read:
             input_string = input_string.split(', ')
             self.brid = input_string[0].replace("'", "")
             self.aid = input_string[1].replace("'", "")
-            self.timestamp = input_string[2].replace("'", "")
+            self.timestamp = str(input_string[2].replace("'", ""))
             self.read_num = input_string[3].replace("'", "")
             self.read_uid_list = input_string[4].replace("'", "")
             self.comment_num = input_string[5].replace("'", "")

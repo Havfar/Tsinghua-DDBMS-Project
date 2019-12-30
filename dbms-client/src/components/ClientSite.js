@@ -28,6 +28,7 @@ export default class ClientSite extends React.Component {
             articles: undefined,
             singleUser: undefined,
             singleArticle: undefined,
+            lastAllFetch: undefined,
         }  
     }
 
@@ -87,6 +88,7 @@ export default class ClientSite extends React.Component {
 
             // this will re render the view with new data
             this.setState({
+                lastAllFetch: "allUsers",
                 TypeSearch: undefined,
               users: data.map((jsonUser, i) => (
                 <User fetchReads={this.fetchUserReads} uid={jsonUser.uid} timestamp={jsonUser.timestamp} name={jsonUser.name} gender={jsonUser.gender} email={jsonUser.email} phone={jsonUser.phone} dept={jsonUser.dept} language={jsonUser.language} region={jsonUser.region} role={jsonUser.region} role={jsonUser.role} prefer_tags={jsonUser.prefer_tags} obtained_credits={jsonUser.obtained_credits} age={data.age} compressed={true} collapseTarget={i} id={i}/>
@@ -112,6 +114,7 @@ genArticles = async() => {
 
             // this will re render the view with new data
             this.setState({
+                lastAllFetch: "allArticles",
                 TypeSearch: undefined,
               articles: data.map((jsonArticle, i) => (
                 <Article genRead={this.callBackGenRead} aid={jsonArticle.aid} timestamp={jsonArticle.timestamp} title={jsonArticle.title} abstrac={jsonArticle.abstract} article_tags={jsonArticle.article_tags} author={jsonArticle.author} language={jsonArticle.language} text={jsonArticle.text} image={jsonArticle.image} video={jsonArticle.video} category={jsonArticle.category} compressed={true} collapseTarget={i} id={i}/>
@@ -312,41 +315,60 @@ toggleSearchBar = () =>{
 
         switch(this.state.TypeSearch){
             case "user":
-                return <div>
+                return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.singleUser}
                 </div>
             case "article":
-                return <div>
+                return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.singleArticle}
                 </div>
             case "allUsers":
-                return <div>
+                return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.users}
                 </div>
             case "allArticles":
-                return <div>
+                return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                     {this.state.articles}
                 </div>
                 // no TypeSearch eg initial load of site
             default:
-                return <div>
+                if(this.state.lastAllFetch == "allArticles"){
+                    return <div className="col">
+                    <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                        {this.state.singleUser}
+                        {this.state.singleArticle}
+                        {this.state.articles}
+                </div>
+                }
+                else if(this.state.lastAllFetch == "allUsers"){
+                return <div className="col">
+                    <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
+                        {this.state.singleUser}
+                        {this.state.singleArticle}
+                        {this.state.users}
+                </div>
+                }
+                else{
+                    return <div className="col">
                     <SearchBar parent={this} callBackSearch={this.callBackSearch}/>
                         {this.state.singleUser}
                         {this.state.singleArticle}
                         {this.state.users}
                         {this.state.articles}
                 </div>
-                
+                }
         }
     }
 
     getPopularRank(){
         return(
+            <div className="col">
             <PopularRank genRead={this.callBackGenRead}/>
+            </div>
         )
     }
 
@@ -383,7 +405,6 @@ toggleSearchBar = () =>{
                     <NavBar callBackLoggedInUser={this.callBackLoggedInUser} parent={this}/>
                     <div class="container mt-5">
                             <div class="row">
-                                <div class="col-lg-12 text-center"></div>
                                     {this.getAcitveComponent()}
                                     {/* {this.genClientSite(this.state.TypeSearch)} */}
                                     {/* {this.getPopularRank()} */}

@@ -12,7 +12,7 @@ export default class PopularRank extends React.Component {
             temporalGranularity: "daily",
             aidList: [],
             category: "",
-            topArticles: [1,2,3,4,5],
+            topArticles: undefined,
             url: undefined,
             article_id_list: undefined,
             must_load_articles_from_list: undefined,

@@ -15,7 +15,9 @@ export default class Article extends React.Component {
             image: undefined,
             video: undefined,
             category: "Technology",
-            compressed: true
+            compressed: true,
+            showBeRead: false,
+            fetchBeReads: false
             }
         }   
     componentDidMount(){
@@ -47,7 +49,7 @@ export default class Article extends React.Component {
                         <p className="col ml-1 font-weight-lighter">{this.state.timestamp}</p>
                     </div>
                     <div className="row">
-                        <p className="col">{this.state.text}</p>
+                        <p className="col">{this.state.abstract}</p>
                     </div>
                 </div>
                 <span className="col-1"/>
@@ -59,6 +61,72 @@ export default class Article extends React.Component {
         this.setState({compressed: !this.state.compressed})
     }
 
+
+    fetchBeReads = async() =>{
+        console.log("fetching")
+
+        let url = "http://localhost:5000/be_read_by_aid/?aid="+this.state.aid
+        let data = await fetch(url, {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+              'Content-Type': 'application/json'
+            }
+        }).then(response => response.json()).catch(err => {
+            console.log(err)
+        })
+
+        // split uid string
+        let uidList = data.read_uid_list.split(",")
+
+        this.setState({
+            beReadRow: uidList.map((uid, i) => (
+                <tr>
+                    <th scope="col">{uid}</th>
+                </tr>
+            )),
+            showBeRead: true,
+            fetchBeReads: true
+        })
+    }
+
+    showBeRead = () => {
+        if(!this.state.showBeRead){
+            return(
+                <button className="btn btn-lg btn-light" onClick={this.fetchBeReads}> Get article user reads </button>
+                )
+        }
+        else if(!this.state.fetchBeReads && this.state.showBeRead){
+            console.log("YAY")
+            return (
+                <table class="table mt-5">
+                    <thead>
+                        <tr>
+                            <th scope="col">uid</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        No bereads available
+                    </tr>
+                </table>
+            )
+        }
+        else{
+            return (
+                <table class="table mt-5">
+                <thead>
+                    <tr>
+                        <th scope="col">uid</th>
+                    </tr>
+                </thead>
+                {this.state.readRows}
+            </table>
+        )
+        }
+
+    }
 
 
     getFullView(){
@@ -84,7 +152,7 @@ export default class Article extends React.Component {
                     <div className="row">
                         <p className="col">{this.state.text}</p>
                     </div>
-
+                    {this.showBeRead()}
                 </div>
                 <span className="col-1"/>
             </div>

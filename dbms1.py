@@ -181,7 +181,7 @@ def load_all_articles():
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
     # Get articles from hive []
-    all_articles = client.get_articles_by_category(category_science)
+    all_articles = client.get_articles_by_category(category_science, page_number=0, page_size=15)
     print("received articles")
     list_all_articles = []
 
@@ -217,6 +217,7 @@ def be_read():
     
     # be_read_table holds a "read_uid_list" string. Needs to be split somehow to get all unique user ids
     be_read_table = client.get_be_read_by_aid(aid = aid, page_size=None, page_number=None)
+
 
     return be_read_table.__dict__
 

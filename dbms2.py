@@ -181,7 +181,7 @@ def load_all_articles():
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
     # Get articles from hive []
-    all_articles_science = client.get_articles_by_category(category_science)
+    all_articles_science = client.get_articles_by_category(category_science, page_number=0, page_size=15)
     all_articles_technology = client.get_articles_by_category(category_technology)
     list_all_articles = []
 
