@@ -344,6 +344,12 @@ celerybeat-schedule
 # mkdocs documentation
 /site
 
+/articles
+
+.pyc
+.idea
+
+/3-sized-db-generation
 # mypy
 .mypy_cache/
 .dmypy.json

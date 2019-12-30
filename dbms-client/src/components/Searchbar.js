@@ -65,10 +65,6 @@ export default class SearchBar extends React.Component  {
         }
     }
 
-    getFilters(){
-
-    }
-
     search(){
         let TypeSearch = ""
         let searchString = ""

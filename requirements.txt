@@ -1,0 +1,6 @@
+numpy
+pillow
+loremipsum
+names
+coolname
+pyhive

@@ -1,10 +1,8 @@
 import datetime
-import json
 import uuid
 from random import random
 import numpy as np
 from PIL import Image
-from shutil import copyfile
 import os
 import loremipsum
 import names
@@ -18,22 +16,43 @@ from io import BytesIO
 USERS_NUM = 10000
 ARTICLES_NUM = 10000
 READS_NUM = 1000000
-
 uid_region = {}
 aid_lang = {}
 
+# Used to create unique ids to Articles/ Users / Reads/ be_reads / pop_rank
+def create_id(prefix):
+    """Creates a new unique id"""
+    return prefix + str(uuid.uuid4())
 
-def convert_img_to_string():
-    pass
 
-def convert_string_to_img():
-    pass
+def get_current_timestamp():
+    """Gets the current timestamp on Hive timestamp format"""
+    return str(datetime.datetime.now())[:-3]
 
-# science:45%   technology:55%
-# en:50%    zh:50%
-# 50 tags
-# 2000 authors
-def gen_an_article (i):
+
+def get_last_day_timestamp():
+    """Gets yesterdays timestamp on Hive timestamp format"""
+    today = datetime.datetime.now()
+    last_day = today - datetime.timedelta(days=1)
+    return str(last_day)[:-3]
+
+
+def get_last_week_timestamp():
+    """Gets last week timestamp on Hive timestamp format"""
+    today = datetime.datetime.now()
+    last_week = today - datetime.timedelta(days=7)
+    return str(last_week)[:-3]
+
+
+def get_last_month_timestamp():
+    """Gets last month timestamp on Hive timestamp format"""
+    today = datetime.datetime.now()
+    last_month = today - datetime.timedelta(days=30)
+    return str(last_month)[:-3]
+
+
+def gen_an_article(i):
+    """Generate a new article"""
     article = {}
     timestamp = get_current_timestamp()
     aid = create_id('a')
@@ -55,7 +74,7 @@ def gen_an_article (i):
     f.close()
 
     # create images
-    image_num = 1#int(random()*5)+1
+    image_num = 1
     image_str = ""
     for j in range(image_num):
         image_str+= 'image_a'+str(i)+'_'+str(j)+'.jpg,'
@@ -63,18 +82,6 @@ def gen_an_article (i):
     num_image = int(random()*5)+1
     for j in range(num_image):
         img = create_img_bin_string()
-
-
-    # create video
-    if random() < 0.05:
-        #has one video
-        video = "video_a"+str(i)+'_video.flv'
-        if random()<0.5:
-            copyfile('./3-sized-db-generation/video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
-        else:
-            copyfile('./3-sized-db-generation/video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
-    else:
-        video = ""
 
     aid_lang[aid] = language
     return Article(
@@ -91,35 +98,8 @@ def gen_an_article (i):
         video = ""
     )
 
-
-# Used to create unique ids to Articles/ Users / Reads/ be_reads / pop_rank
-def create_id(prefix):
-    return prefix + str(uuid.uuid4())
-
-
-def get_current_timestamp():
-    return str(datetime.datetime.now())[:-3]
-
-
-def get_last_day_timestamp():
-    today = datetime.datetime.now()
-    last_day = today - datetime.timedelta(days=1)
-    return str(last_day)[:-3]
-
-
-def get_last_week_timestamp():
-    today = datetime.datetime.now()
-    last_week = today - datetime.timedelta(days=7)
-    return str(last_week)[:-3]
-
-
-def get_last_month_timestamp():
-    today = datetime.datetime.now()
-    last_month = today - datetime.timedelta(days=30)
-    return str(last_month)[:-3]
-
-
 def gen_an_user (i):
+    """Generate a new user"""
     user = {}
     timestamp = get_current_timestamp()
     uid = create_id("u")
@@ -128,7 +108,6 @@ def gen_an_user (i):
     email = "email%d" % i
     phone = "phone%d" % i
     dept  = "dept%d" % int(random() * 20)
-    grade = "grade%d" % int(random() * 4 + 1)
     age = int(random()*100)
     language = "en" if random() > 0.8 else "zh"
     region = "Beijing" if random() > 0.4 else "HongKong"
@@ -154,20 +133,17 @@ p["Hong Kong" + "en"] = [1, 0.3, 0.3, 0.2]
 p["Hong Kong" + "zh"] = [0.8, 0.2, 0.2, 0.1]
 
 
-def gen_an_read(i):
-
-    timeBegin = get_current_timestamp()
-    read = {}
+def gen_an_read(i, uid, aid):
+    """Generate a new read based on user and article"""
     timestamp = get_current_timestamp()
     rid = create_id("r")
-    uid = str(int(random() * USERS_NUM))
-    aid= str(int(random() * ARTICLES_NUM))
+    uid = uid
+    aid= aid
     region = uid_region[uid]
     lang = aid_lang[aid]
     ps = p[region + lang]
 
     if (random() > ps[0]):
-        # read["readOrNot"] = "0";
         return gen_an_read(i)
     else:
         read_or_not = True
@@ -177,11 +153,12 @@ def gen_an_read(i):
         comment_or_not = True if random() < ps[2] else False
         share_or_not = True if random() < ps[3] else False
         comment_detail = "comments to this article: (" + uid + "," + aid + ")"
-    return Read(rid, timestamp=timestamp, uid=uid, aid= aid, read_or_not=read_or_not, read_time_length=read_time_length, read_sequence=read_sequence, agree_or_not=agree_or_not,
+    return Read(rid=rid, timestamp=timestamp, uid=uid, aid= aid, read_or_not=read_or_not, read_time_length=read_time_length, read_sequence=read_sequence, agree_or_not=agree_or_not,
                 comment_or_not= comment_or_not, share_or_not=share_or_not, comment_detail=comment_detail)
 
 
 def create_img_bin_string():
+    """creates a image and save it as a base64 binary"""
     buffered = BytesIO()
     a = np.random.randint(0, 255, (360, 480, 3))
     img = Image.fromarray(a.astype('uint8')).convert('RGB')
@@ -191,22 +168,6 @@ def create_img_bin_string():
 
 
 def bin_to_img(bin_str):
+    """converts a binary string to image"""
     img = Image.frombytes(data=bin_str)
     return img
-
-def get_last_day_timestamp():
-    today = datetime.datetime.now()
-    last_day = today - datetime.timedelta(days=1)
-    return str(last_day)[:-3]
-
-
-def get_last_week_timestamp():
-    today = datetime.datetime.now()
-    last_week = today - datetime.timedelta(days=7)
-    return str(last_week)[:-3]
-
-
-def get_last_month_timestamp():
-    today = datetime.datetime.now()
-    last_month = today - datetime.timedelta(days=30)
-    return str(last_month)[:-3]

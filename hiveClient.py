@@ -1,18 +1,11 @@
-import datetime
-import random
+
 from typing import List
-
-from PIL import Image
 from pyhive import hive
-
 from Models.Article import Article
 from Models.Be_Read import Be_read
-from Models.Popular_rank import Popular_rank
 from Models.Read import Read
 from Models.User import User
 import uuid
-import datetime
-import numpy as np
 import config
 import utils
 class HiveClient:
@@ -20,12 +13,27 @@ class HiveClient:
         self.conn = hive.Connection(host=host_name, port=portNumber, username=user, password=password,
                                     auth='CUSTOM')
 
-    # Used to create unique ids to Articles/ Users / Reads/ be_reads / pop_rank
-    def create_id(self, prefix):
-        return prefix + str(uuid.uuid4())
-
-    # Returns table by name. Possiblity to change selected columns
     def get_table_by_name(self, table_name, columns='*', order_by='asc', page_size=None, page_number = None):
+        """Get the content of table by the name of table, only used locally
+
+            Parameters
+            ----------
+            table_name : str
+                Name of table
+            columns : str
+                Select which columns to query
+            order_by: str
+                Order by asc or dsc
+            page_size: int
+                limit the query result
+            page_number: int
+                offsets the query result
+
+            Returns
+            -------
+            result
+                a list of table rows if the table exists, else None
+        """
         cur = self.conn.cursor()
         query = 'select ' + columns + ' from ' + table_name
         if page_size != None and page_number != None:
@@ -37,9 +45,23 @@ class HiveClient:
             result = "None"
         return result
 
-    # Returns a list of all users whom have read the article
-    # May need to change if it is not possible to update table row (e.g check for latest row)
     def get_read_by_aid(self, aid, page_size=None, page_number = None):
+        """Gets all reads by the article ID
+
+            Parameters
+            ----------
+            aid : str
+                A unique ID for an article
+            page_size: int
+                limit the query result
+            page_number: int
+                offsets the query result
+
+            Returns
+            -------
+            reads
+                a list of table Read items for the article
+            """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -63,6 +85,22 @@ class HiveClient:
         return reads
 
     def get_read_by_uid(self, uid, page_size=None, page_number = None):
+        """Gets all reads by a specific user by its user ID
+
+           Parameters
+           ----------
+           udi : str
+               A unique ID for a user
+           page_size: int
+               limit the query result
+           page_number: int
+               offsets the query result
+
+           Returns
+           -------
+           reads
+               a list of table Read items for the user
+           """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -86,6 +124,22 @@ class HiveClient:
         return reads
     
     def get_all_users(self, region, page_size=None, page_number=None):
+        """Gets all users in the user table by region
+
+           Parameters
+           ----------
+           region : str
+               Either HongKong or Beijing
+           page_size: int
+               limit the query result
+           page_number: int
+               offsets the query result
+
+           Returns
+           -------
+           user_list
+               a list of table Users items for the region
+           """
         cur = self.conn.cursor()
         query = 'select * from users where region ="' + region + '"' 
         if page_size != None and page_number != None:
@@ -112,6 +166,22 @@ class HiveClient:
         return user_list
     
     def get_all_articles(self, category, page_size=None, page_number=None):
+        """Gets all articles by region
+
+           Parameters
+           ----------
+           category : str
+                Either Science or Technology
+           page_size: int
+               limit the query result
+           page_number: int
+               offsets the query result
+
+           Returns
+           -------
+           article_list
+               a list of table Articles by a specific category
+           """
         cur = self.conn.cursor()
         query = 'select * from articles where category ="' + category + '"' 
         if page_size != None and page_number != None:
@@ -136,8 +206,14 @@ class HiveClient:
             )
         return article_list
 
-    # Used for local testing
     def get_all_tables(self):
+        """Gets all table names in database
+
+           Returns
+           -------
+           result
+               a list of tables
+           """
         cur = self.conn.cursor()
         cur.execute('show tables')
         result = cur.fetchall()
@@ -145,6 +221,13 @@ class HiveClient:
 
     # Used for local testing
     def get_all_databases(self):
+        """Gets all database names in hive
+
+             Returns
+             -------
+             result
+                 a list of databases
+             """
         cur = self.conn.cursor()
         cur.execute('show databases')
         result = cur.fetchall()
@@ -152,6 +235,16 @@ class HiveClient:
 
     # Used for local testing
     def describe_table(self, table_name):
+        """Used for local testing, describes a table by table name
+            Parameters
+            ----------
+            table_name : str
+                Name of a table in the database
+            Returns
+            -------
+            result
+                a list of attributes
+             """
         cur = self.conn.cursor()
         try:
             cur.execute('describe ' + table_name )
@@ -160,36 +253,60 @@ class HiveClient:
             result = "None"
         return result
 
-    # Input: User object
     def create_user(self, user):
+        """Creates a user
+
+            Parameters
+            ----------
+            user : User
+                The user object to insert into user table
+             """
         cur = self.conn.cursor()
-        #cur.execute('insert into table user_table values' + user.__str__())
         cur.execute('insert into table users partition(region ="' + user.region + '") values' + user.__str__())
 
-    # Input: User object
     def create_users(self, users, region):
+        """Bulk creates a users
+
+            Parameters
+            ----------
+            users : User[]
+                A list of Users to be inserted to table
+            region: str
+                the region to partition them in (Either HongKong or Beijing)
+             """
         cur = self.conn.cursor()
-        #cur.execute('insert into table user_table values' + user.__str__())
         query = 'insert into table users partition(region ="' + region + '") values'
         i = 1
         for user in users:
             query += '  ("' + user.uid +  '", "' + str(user.timestamp) + '", "' + user.name + '", "' + user.gender + '", "' + user.email + '", "' + user.phone + '", "' + user.dept + '", "' + user.language + '", "' + user.role + '", " ' + user.prefer_tags + '", ' + str(user.obtained_credits) + ', ' + str(user.age) + ')'
             if(i != len(users)):
-                # query += '  union all '
                 query += ', '
             i+=1
-        #print(query, len(users), i)
         cur.execute(query)
 
-        # Input: Article object
 
     def create_article(self, article):
+        """Creates an Article
+
+            Parameters
+            ----------
+            article : Article
+                The Article object to insert into articles table
+             """
         cur = self.conn.cursor()
         cur.execute(
             'insert into table articles partition(category ="' + article.category + '") values' + article.__str__())
-        # Input: Article object
 
     def create_articles(self, articles, category):
+        """Bulk creates a articles
+
+            Parameters
+            ----------
+            articles : Article[]
+                A list of Article to be inserted to table
+            category: str
+                the category to partition them in (Either Science or Technology)
+             """
         cur = self.conn.cursor()
         query = 'insert into table articles partition(category ="' + category + '") values'
         i = 1
@@ -198,12 +315,17 @@ class HiveClient:
             if (i != len(articles)):
                 query += ', '
             i += 1
-        # print(query, len(users), i)
         cur.execute(query)
         self.create_be_reads(articles, category)
 
-    # Input: Read object
     def create_read(self, read):
+        """Creates an Read
+
+            Parameters
+            ----------
+            read : Read
+                The Read object to insert into read table
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -211,6 +333,13 @@ class HiveClient:
 
     # Input: Be_read object
     def create_be_read(self, be_read):
+        """Creates a be_read
+
+            Parameters
+            ----------
+            be_read : Be_read
+                The Be_read object to insert into be_read table
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -218,6 +347,15 @@ class HiveClient:
 
     # Input: Be_read object
     def create_be_reads(self, articles, category):
+        """Bulk creates a be_reads, created after a creation of an article
+
+            Parameters
+            ----------
+            articles : Article[]
+                A list of Articles to be inserted to table
+            category: str
+                the category to partition them in (Either Science or Technology)
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -230,30 +368,34 @@ class HiveClient:
             i += 1
         cur.execute(query)
 
-    # Input: Popular_rank object
     def create_popular_rank(self, pop_rank):
+        """Creates an popular Rank
+
+            Parameters
+            ----------
+            pop_rank : Popular_Rank
+                The Article object to insert into articles table
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
         cur.execute('insert into table popular_rank partition(category = "'+ pop_rank.category +'") values' + pop_rank.__str__())
 
-    # Experimenting with joins
-    # NOT FOR PRODUCTION
-    def experiment(self, user, page_size=None, page_number = None):
-        cur = self.conn.cursor()
-        cur.execute('set hive.support.concurrency=true')
-        cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-        cur.execute('select  * '
-                    'from (select aid, uid from read where uid="' + user.uid +'") r '
-                    'left outer join (select uid, name from user_table) usr '
-                    'on ( r.uid = usr.uid) '
-                    'left outer join (select aid, title from article_table) artcl '
-                    'on (r.aid = artcl.aid) '
-                    )
-        result = cur.fetchall()
-        return result
-
     def get_read_table_by_uid(self, uid, page_size=None, page_number = None):
+        """Gets the reads by user
+            Parameters
+            ----------
+            uid : str
+                User ID
+            page_size: int
+               limit the query result
+            page_number: int
+               offsets the query result
+            Returns
+            -------
+            read_list
+                a list of Reads
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -267,22 +409,20 @@ class HiveClient:
             read_list.append(Read(input_string = element))
         return read_list
 
-    def get_read_table_by_read(self, read, page_size=None, page_number = None):
-        cur = self.conn.cursor()
-        query = 'select  * ' \
-                'from (select aid, uid from read where id="' + read.id +'") r ' \
-                'left outer join (select uid, name from users) usr ' \
-                'on ( r.uid = usr.uid) ' \
-                'left outer join (select aid, title from articles) artcl ' \
-                'on (r.aid = artcl.aid) '
-
-        if page_size != None and page_number != None:
-            query += " limit " + str(page_size) + " offset " + str(page_number*page_size)
-        cur.execute(query)
-        result = cur.fetchall()
-        return result
 
     def get_article_by_aid(self, aid, category = None):
+        """Gets the article by aid
+            Parameters
+            ----------
+            aid : str
+                Article ID
+            category: str
+               category of article
+            Returns
+            -------
+            article
+                an Article object with the specific aid
+             """
         cur = self.conn.cursor()
         if category == None:
             query = 'select * from articles where aid="' + aid + '"'
@@ -306,6 +446,18 @@ class HiveClient:
 
     # Should provide region
     def get_user_by_uid(self, uid, region = None):
+        """Gets the user by uid
+            Parameters
+            ----------
+            uid : str
+                User ID
+            region: str
+               region of the user
+            Returns
+            -------
+            user
+                a User object
+             """
         if region == None:
             cur = self.conn.cursor()
             cur.execute('select * from users where users.uid="' + uid + '"')
@@ -331,6 +483,20 @@ class HiveClient:
         return user
 
     def get_users_by_region(self, region, page_size=None, page_number = None):
+        """Gets the all users in a region
+            Parameters
+            ----------
+            region : str
+                region of users
+            page_size: int
+               limit the query result
+            page_number: int
+               offsets the query result
+            Returns
+            -------
+            users
+                all users in a region
+             """
         cur = self.conn.cursor()
         query = 'select * from users where region="' + region + '"'
         if page_size != None and page_number != None:
@@ -359,6 +525,20 @@ class HiveClient:
         return users
 
     def get_articles_by_category(self, category, page_size=None, page_number = None):
+        """Gets the all users in a region
+            Parameters
+            ----------
+            category : str
+                category of users
+            page_size: int
+               limit the query result
+            page_number: int
+               offsets the query result
+            Returns
+            -------
+            articles
+                all articles in a category
+             """
         cur = self.conn.cursor()
         query = 'select * from articles where category="' + category + '"'
         if page_size != None and page_number != None:
@@ -385,6 +565,20 @@ class HiveClient:
 
     # Returns a list of read objects whom have commented
     def get_article_reads_by_aid(self, aid, page_size=None, page_number = None):
+        """Gets the article reads by aid
+            Parameters
+            ----------
+            aid : str
+                Article ID
+            page_size: int
+               limit the query result
+            page_number: int
+               offsets the query result
+            Returns
+            -------
+            read_list
+                a list of reads of the article
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -399,6 +593,22 @@ class HiveClient:
 
     #Retruns the read from an user and an article
     def get_read(self, aid, uid, page_size=None, page_number = None):
+        """Gets the article reads by aid
+            Parameters
+            ----------
+            aid : str
+                Article ID
+            uid : str
+                User ID
+            page_size: int
+               limit the query result
+            page_number: int
+               offsets the query result
+            Returns
+            -------
+            read
+                a Read object to the the spesific user and article
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -407,6 +617,21 @@ class HiveClient:
         return read
 
     def get_be_read_by_aid(self, aid, page_size=None, page_number = None):
+        """Gets the be_read by a spefic article id
+            Parameters
+            ----------
+            aid : str
+                Article ID
+            page_size: int
+               limit the query result
+            page_number: int
+               offsets the query result
+            Returns
+            -------
+            be_read
+                A Be_read item
+
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -417,8 +642,22 @@ class HiveClient:
         be_read = Be_read(input_string = str(cur.fetchall()))
         return be_read
 
-    # Returns a list of read objects whom have read
+
     def get_read_count_by_aid(self, aid, page_size=None, page_number = None):
+        """Gets all reads from a aid
+            Parameters
+            ----------
+            aid : str
+                Article ID
+            page_size: int
+               limit the query result
+            page_number: int
+               offsets the query result
+            Returns
+            -------
+            read_list
+                a list of reads where all have read the article
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -432,6 +671,12 @@ class HiveClient:
         return read_list
 
     def update_read(self, read):
+        """Updates a read item
+            Parameters
+            ----------
+            read : Read
+                Read object that will be updated
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -447,14 +692,25 @@ class HiveClient:
                     + ' where read.rid = "' + read.rid
                     )
 
-
     def delete_read(self,read):
+        """Delete a read
+            Parameters
+            ----------
+            read : Read
+                Read object to be removed
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
         cur.execute('delete from read where(read.uid = "'+ read.uid + '" and read.aid = "' + read.aid + '")')
 
     def update_be_read(self, be_read):
+        """Updates a be_read item
+            Parameters
+            ----------
+            be_read : Be_read
+                Be_read object that will be updated
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -470,14 +726,13 @@ class HiveClient:
                     + ' where brid = "' + be_read.brid
                     )
 
-    def update_pop_rank_aid_list(self, pop_rank, new_aid_list):
-        cur = self.conn.cursor();
-        cur.execute('set hive.support.concurrency=true')
-        cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-        query = 'update pop_rank set article_aid_list = "' + new_aid_list + '" where pid ="' + pop_rank.pid + '"'
-        cur.execute(query)
-
     def delete_pop_rank_item(self, pop_rank):
+        """Delete a pop_rank item
+            Parameters
+            ----------
+            pop_rank : Popular_rank
+                pop_rank object to be removed
+             """
         cur = self.conn.cursor();
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -485,29 +740,17 @@ class HiveClient:
         cur.execute(query)
 
 
-    
-    def get_popularity_rank(self, temporal_granularity):
-        cur = self.conn.cursor(())
-        cur.execute('set hive.support.concurrency=true')
-        cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-
-        if(temporal_granularity == "weekly"):
-            query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_week_timestamp() + '") artcl on ( br.aid = artcl.aid)'
-        elif(temporal_granularity == "monthly"):
-            query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_month_timestamp() + '") artcl on ( br.aid = artcl.aid)'
-        else:
-            query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_day_timestamp() +'") artcl on ( br.aid = artcl.aid)'
-
-        # query += '  order_by read_num desc limit 5'
-        cur.execute(query)
-        result = cur.fetchall()
-        article_list = []
-        for article in result:
-            print(article)
-
-        return result
-
     def get_pop_rank(self, time):
+        """Gets all reads from a aid
+            Parameters
+            ----------
+            time : str
+                temporalGranularity= “daily”, “weekly”, or “monthly”
+            Returns
+            -------
+            article_list
+                a list of the top 5 articles
+             """
         cur = self.conn.cursor()
         cur.execute('set hive.support.concurrency=true')
         cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
@@ -540,39 +783,5 @@ class HiveClient:
             article_list.append(a)
         return article_list
 
-    #ONLY USED FOR EXPERIMENTING
-    def misc(self):
-        cur = self.conn.cursor()
-        #img = str(img)
-        #img = "BILDE"
-        #query = 'insert into table articles_binary partition(category = "tech") values("id1", "2019-12-20 13:38:19.020", "text","' + str(img_str) + '", " video", " noe")'
-        #cur.execute(query)
-        #query = 'drop table articles_binary'
-        #cur.execute(query)
-        #query = 'Create table articles_binary(aid string, var_timestamp timestamp, title string, text string, image binary, video string) Partitioned by (category string)'
-        cur.execute('set hive.support.concurrency=true')
-        cur.execute('set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager')
-        # query = 'select  * from ( select var_timestamp, aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_week_timestamp() +'") artcl on ( br.aid = artcl.aid)'
-        query = 'select  * from ( select aid, read_num from be_read) br left outer join (select * from articles where var_timestamp >"' + get_last_week_timestamp() + '") artcl on ( br.aid = artcl.aid) order by read_num desc limit 5'
-        cur.execute(query)
 
-        result = cur.fetchall()
-        article_list = []
-        for item in result:
-            a = Article(
-                aid=item[2],
-                timestamp=item[3],
-                title=item[4],
-                abstract=item[5],
-                article_tags=item[6],
-                author=item[7],
-                language=item[8],
-                text=item[9],
-                image=item[10],
-                video=item[11],
-            )
-            article_list.append(a)
-        return article_list
 
-#print("setting up connection " , config.host_name, config.port)
-client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)

@@ -1,16 +1,12 @@
 from flask import Flask
 from flask import request
-from flask import send_from_directory
-from flask import render_template
 import utils
 import config
 import json
 from hiveClient import HiveClient
 from Models.User import User
 from Models.Article import Article
-from Models.Be_Read import Be_read
 from Models.Read import Read
-import random
 from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
@@ -25,8 +21,6 @@ def hello_world():
 def postjson():
     # mimetype must be json
     content = request.json
-    print("content:", content)
-    print("content.name:", content["name"])
     return content
 
 # create a read for when a user reads an article
@@ -59,7 +53,6 @@ def create_read():
 def create_user():
     # Get json
     content = request.json
-    print("Content:", content)
 
     # Create hiveclient
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
@@ -116,12 +109,7 @@ def load_pop_article():
 def load_article():
     uid = request.args.get('uid')
     aid = request.args.get('aid')
-    print("uid:", uid, "aid:", aid)
 
-    #content = request.json
-    #print("Content:", content)
-    #uid = content["uid"]
-    #aid = content["aid"]
     current_time = utils.get_current_timestamp()
 
     # Create hiveclient
@@ -181,8 +169,10 @@ def load_all_articles():
     client = HiveClient(host_name=config.host_name, password=config.password, user=config.user, portNumber=config.port)
 
     # Get articles from hive []
+
     all_articles = client.get_articles_by_category(category_science, page_number=0, page_size=15)
     print("received articles")
+
     list_all_articles = []
 
     # Convert users to dicts and append to list
@@ -205,7 +195,6 @@ def load_user():
 
     # Get user from hive
     requested_user = client.get_user_by_uid(uid = uid, region=region)
-    print("user from client:", requested_user.__dict__)
     return requested_user.__dict__
 
 # returns be_read object holding all uid's that has read the article with given aid - json format {}
@@ -274,9 +263,4 @@ def popular_rank():
 
 
 if __name__ == '__main__':
-    #querybuilder = queryBuilder("ok", "tableNameTest", "articleTableTest", "userTableTest", "readTableTest", "beReadTableTest", "popularRankTableTest")
-    #print(querybuilder.selectUserFromTable(2, None, "region", None, None, "region", 5))
-    #print(querybuilder.selectUserFromTable(None, "userID", ">", 23, None, None, None))
-    # if no port is provided it defaults to 5000
-
     app.run(port=5000)
