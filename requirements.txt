@@ -4,3 +4,8 @@ loremipsum
 names
 coolname
 pyhive
+thrift
+thrift_sasl
+sasl
+flask
+flask_cors

@@ -14,30 +14,35 @@ This project was create by Håvard Farestveit and Tobias Skjelvik as a course pr
 
 ## Installation 
 
+### Clone repo
+
 ```bash
-pip install requirements.txt
+git clone https://github.com/Havfar/Tsinghua-DDBMS-Project.git
 ```
 
-#### Update config
+```bash
+cd Tsinghua-DDBMS-Project
+pip install -r requirements.txt
 
-#
+cd dbms-client
+npm install
+```
 
 ## Usage
 
-### Start DBMS
+### Start DBMS 1 and DBMS 2
 
-```python
-cd ..
-start *1
-start *2
+```
+cd Tsinghua-DDBMS-Project
+python dmbs1.py
+python dbms2.py
 ```
 
 ### Start client
 
 ```python
-cd ..
+cd dbms-client/
 npm start
-
 ```
 
 ### Monitoring the running status
